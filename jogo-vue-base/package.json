@@ -1,6 +1,11 @@
 {
   "name": "meu-jogo",
   "version": "0.0.1",
+  "description": "Um jogo simples feito com Vue 3 e Vite",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rafaelbrk75/jogo-front"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
