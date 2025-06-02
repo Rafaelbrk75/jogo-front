@@ -20,7 +20,7 @@
       <!-- Sombra do Boss -->
       <img src="/sombra.png" class="sombra sombra-boss" />
 
-      <!-- Boss -->
+      <!-- Boss (é fundamental que o elemento aqui dentro tenha class="boss") -->
       <Boss :bossSrc="bossSrc" />
 
       <!-- Sombra do Player (fora do wrapper para não subir junto) -->
@@ -95,6 +95,15 @@
         alt="Poder"
         class="poder"
         :style="{ right: poderX + 'px' }"
+      />
+
+      <!-- Tiro de Laser do Player -->
+      <img
+        v-if="tiroVisivel"
+        src="/impacto_laser_pixelado.png"
+        alt="Tiro de Laser"
+        class="tiro"
+        :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }"
       />
 
       <!-- Áudios -->
@@ -204,6 +213,19 @@ let timerPergunta = null;
 const poderAnims = [];
 const moving = { left: false, right: false, down: false };
 
+// ──────────────────────────────────────────────────────────────
+// Estado de vida do BOSS
+// ──────────────────────────────────────────────────────────────
+const bossVida = ref(3); // você pode ajustar o valor inicial (ex: 3 pontos de vida)
+
+// ──────────────────────────────────────────────────────────────
+// Estados do TIRO (laser do player)
+// ──────────────────────────────────────────────────────────────
+const tiroVisivel = ref(false);
+const tiroX = ref(0);
+const tiroY = ref(0);
+const tiroSpeed = 15;
+let tiroAnimFrame = null;
 
 // ──────────────────────────────────────────────────────────────
 // Exibe a HQ antes de iniciar o jogo
@@ -228,6 +250,7 @@ function pularIntro() {
 function iniciarJogo() {
   telaAtual.value = "jogo";
 
+  // Reinicia música de fundo
   if (somNivel1.value) {
     somNivel1.value.currentTime = 0;
     somNivel1.value.loop = true;
@@ -257,14 +280,20 @@ function iniciarJogo() {
   grounded.value = true;
   velocityY = 0;
 
+  // Reset de vida do Boss
+  bossVida.value = 3;
+
+  // Listeners de teclado e loop de jogo
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
   frameLoop = requestAnimationFrame(gameLoop);
 
+  // Animação simples de sprite do Boss (troca entre boss.png e boss2.png)
   bossAnim = setInterval(() => {
     bossSrc.value = bossSrc.value.endsWith("2.png") ? "/boss.png" : "/boss2.png";
   }, 300);
 
+  // Lógica do poder que “vem do Boss”
   poderLoop = setInterval(() => {
     if (jogoPausado.value) return;
     poderVisivel.value = true;
@@ -278,8 +307,7 @@ function iniciarJogo() {
       const pl = document.querySelector(".player");
 
       if (pEl && pl && podePerder && !invulneravel.value) {
-  const r1Full = pEl.getBoundingClientRect();
-  // ...
+        const r1Full = pEl.getBoundingClientRect();
         const r1 = {
           top: r1Full.top + 20,
           bottom: r1Full.bottom - 20,
@@ -388,6 +416,11 @@ function onKeyDown(e) {
   }
 
   if (e.key === "Escape") togglePause();
+
+  // ───────  DISPARAR O TIRO COM A TECLA F  ───────
+  if (e.key.toLowerCase() === "f") {
+    dispararTiro();
+  }
 }
 
 function onKeyUp(e) {
@@ -401,6 +434,74 @@ function onKeyUp(e) {
       somAgachando.value.currentTime = 0;
     }
   }
+}
+
+// ──────────────────────────────────────────────────────────────
+// Função que dispara o laser (imagem “impacto_laser_pixelado.png”)
+// ──────────────────────────────────────────────────────────────
+function dispararTiro() {
+  // Se já estiver atirando, não dispara outro
+  if (tiroVisivel.value) return;
+
+  // Define a posição inicial do tiro na “boca” do player
+  tiroX.value = playerX.value + 60; // ajuste horizontal conforme o sprite
+  tiroY.value = jumpY.value + 40;   // ajuste vertical conforme o sprite
+  tiroVisivel.value = true;
+
+  function animarTiro() {
+    if (jogoPausado.value || gameOver.value) {
+      cancelAnimationFrame(tiroAnimFrame);
+      return;
+    }
+
+    tiroX.value += tiroSpeed;
+
+    // ──── CHECA COLISÃO COM O BOSS ────
+    const bossEl = document.querySelector(".boss");
+    const tiroEl = document.querySelector(".tiro");
+    if (bossEl && tiroEl) {
+      const rBoss = bossEl.getBoundingClientRect();
+      const rTiro = tiroEl.getBoundingClientRect();
+      const houveColisao =
+        rTiro.left < rBoss.right &&
+        rTiro.right > rBoss.left &&
+        rTiro.top < rBoss.bottom &&
+        rTiro.bottom > rBoss.top;
+
+      if (houveColisao) {
+        // Diminui vida do Boss
+        if (bossVida.value > 0) {
+          bossVida.value--;
+          // Aqui você pode tocar um som de sucesso ou mudar a sprite do Boss, etc.
+          // Exemplo: somAcerto.value.currentTime = 0; somAcerto.value.play();
+          console.log("Boss foi atingido! Vida restante:", bossVida.value);
+        }
+        // “Destroi” o tiro
+        tiroVisivel.value = false;
+        cancelAnimationFrame(tiroAnimFrame);
+
+        // Se a vida do Boss zerou, ele “morre” (você pode fazer algo aqui)
+        if (bossVida.value <= 0) {
+          console.log("Boss derrotado!");
+          // Por exemplo, muda o sprite do Boss ou exibe tela de vitória:
+          // bossSrc.value = "/boss_morto.png";
+          // invulneravel.value = true; // para não receber mais dano
+        }
+        return;
+      }
+    }
+
+    // Se o tiro sair da tela, esconde e cancela animação
+    if (tiroX.value > window.innerWidth) {
+      tiroVisivel.value = false;
+      cancelAnimationFrame(tiroAnimFrame);
+      return;
+    }
+
+    tiroAnimFrame = requestAnimationFrame(animarTiro);
+  }
+
+  tiroAnimFrame = requestAnimationFrame(animarTiro);
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -752,13 +853,19 @@ function limparJogo() {
   poderAnims.length = 0;
   if (somNivel1.value) somNivel1.value.pause();
 
-  //faz pausar todos os sons qnd vier a tela de gameover
+  // Faz pausar todos os sons quando vier a tela de game over
   [somImpacto, somAgachando, somRelogio, somPulo, somMoeda, somAcerto, somPerda].forEach((som) => {
-  if (som.value) {
-    som.value.pause();
-    som.value.currentTime = 0;
+    if (som.value) {
+      som.value.pause();
+      som.value.currentTime = 0;
+    }
+  });
+
+  // Se houver um tiro ativo, interrompe a animação e esconde
+  if (tiroAnimFrame) {
+    cancelAnimationFrame(tiroAnimFrame);
+    tiroVisivel.value = false;
   }
-});
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -1048,7 +1155,19 @@ onMounted(() => {
   box-shadow: 4px 4px black;
   cursor: pointer;
 }
+
+/* Estilos para o tiro de laser */
+.tiro {
+  position: absolute;
+  width: 180px;          /* ajuste para deixar o tiro maior */
+  height: auto;
+  image-rendering: pixelated;
+  z-index: 2;
+  pointer-events: none;
+}
 </style>
+
+
 
 
 
