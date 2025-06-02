@@ -13,7 +13,6 @@
     <div
       v-else-if="telaAtual === 'jogo'"
       class="cenario"
-      @click="onCenarioClick"
     >
       <Hud :vidas="vidas" />
 
@@ -503,21 +502,6 @@ function dispararTiro() {
   }
 
   tiroAnimFrame = requestAnimationFrame(animarTiro);
-}
-
-// ──────────────────────────────────────────────────────────────
-// Clique no cenário (para pausar / despausar)
-// ──────────────────────────────────────────────────────────────
-function onCenarioClick() {
-  // Se alguma pergunta estiver ativa, não dispara togglePause
-  if (
-    mostrarPergunta.value ||
-    mostrarPerguntaPrata.value ||
-    mostrarPerguntaDourada.value
-  ) {
-    return;
-  }
-  togglePause();
 }
 
 // ──────────────────────────────────────────────────────────────
