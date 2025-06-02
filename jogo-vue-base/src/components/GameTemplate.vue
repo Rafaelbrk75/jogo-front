@@ -16,6 +16,11 @@
             <!-- Sombra do Boss -->
             <img src="/sombra.png" class="sombra sombra-boss" />
 
+            <!-- Barra de vida do Boss -->
+            <div class="barra-vida">
+                <div class="barra-vida-fill" :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"></div>
+            </div>
+
             <!-- Boss (o elemento deve ter class="boss") -->
             <Boss :bossSrc="bossSrc" />
 
@@ -1102,5 +1107,37 @@ onMounted(() => {
     image-rendering: pixelated;
     z-index: 2;
     pointer-events: none;
+}
+
+/* Contêiner da barra (fundo escuro) */
+.barra-vida {
+    position: absolute;
+    top: 10px;
+    /* ajuste a posição vertical conforme seu layout */
+    right: 10px;
+    /* ou esquerdo, dependendo de onde quiser exibir */
+    width: 200px;
+    /* largura total da barra */
+    height: 20px;
+    /* altura da barra */
+    background-color: #444;
+    /* cor de fundo “vazia” */
+    border: 2px solid #222;
+    /* borda - opcional */
+    border-radius: 4px;
+    /* cantos arredondados - opcional */
+    overflow: hidden;
+    z-index: 10;
+    /* garantir que fique acima do fundo e abaixo do boss */
+}
+
+/* Parte “cheia” da barra (cor que diminui) */
+.barra-vida-fill {
+    height: 100%;
+    /* ocupa toda a altura de .barra-vida */
+    background-color: #e74c3c;
+    /* cor vermelha para vida restante */
+    transition: width 0.2s ease;
+    /* animação suave quando a vida muda */
 }
 </style>
