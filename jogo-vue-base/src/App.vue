@@ -1,10 +1,8 @@
 <template>
-  <div class="game-wrapper">
-    <Game />
-  </div>
+  <FaseManager />
 </template>
 
 <script setup>
-import Game from './components/Game.vue'
+import FaseManager from './components/FaseManager.vue'
 </script>
 

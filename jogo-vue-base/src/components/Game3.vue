@@ -1,6 +1,6 @@
-<!-- Game2.vue -->
+<!-- Game3.vue -->
 <template>
-    <GameTemplate :bossVidaInicial="5" :cenario="'/cenario2.png'" :musica="'/nivel2.mp3'"
+    <GameTemplate :bossVidaInicial="7" :cenario="'/cenario3.png'" :musica="'/nivel3.mp3'"
         @vencerNivel="$emit('vencerNivel')" />
 </template>
 
