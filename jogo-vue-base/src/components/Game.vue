@@ -491,8 +491,9 @@ function dispararTiro() {
       }
     }
 
+    const larguraTiro = 180;
     // Se o tiro sair da tela, esconde e cancela animação
-    if (tiroX.value > window.innerWidth) {
+    if (tiroX.value > window.innerWidth + larguraTiro) {
       tiroVisivel.value = false;
       cancelAnimationFrame(tiroAnimFrame);
       return;
