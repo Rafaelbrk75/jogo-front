@@ -121,8 +121,13 @@ const props = defineProps({
     bossVidaInicial: {
         type: Number,
         default: 3
+    },
+    bossSrc: {
+        type: String,
+        required: true
     }
 });
+
 
 // ──────────────────────────────────────────────────────────────
 // Estados principais
@@ -134,7 +139,7 @@ const vidas = reactive([true, true, true]);
 const playerX = ref(50);
 const jumpY = ref(0);
 const playerSrc = ref("/player.png");
-const bossSrc = ref("/boss.png");
+const bossSrc = ref(props.bossSrc);
 const poderX = ref(0);
 const poderVisivel = ref(false);
 const invulneravel = ref(false);
