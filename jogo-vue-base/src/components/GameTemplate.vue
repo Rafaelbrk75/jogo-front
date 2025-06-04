@@ -52,13 +52,13 @@
       />
       <img
         v-if="mostrarMoedaPrata"
-        :src="`/moedaPrata${moedaPrataFrame}.png`"
+        :src="moedas.prata[moedaPrataFrame - 1]"
         alt="Moeda Prata Girando"
         class="moeda-girando"
       />
       <img
         v-if="mostrarMoedaDourada"
-        :src="`/moedaDourada${moedaDouradaFrame}.png`"
+        :src="moedas.dourada[moedaDouradaFrame - 1]"
         class="moeda-girando-dourada"
       />
 
@@ -360,34 +360,35 @@ function onKeyDown(e) {
   if (jogoPausado.value || gameOver.value) return;
 
   // Responder pergunta bronze
-  if (mostrarPergunta.value && /^[0-9]$/.test(e.key)) {
-    respostaDigitada.value += e.key;
-    if (respostaDigitada.value === String(perguntaBronze.value.resposta)) {
-      encerrarPergunta(true);
-    } else if (respostaDigitada.value.length >= 2) {
-      encerrarPergunta(false);
-    }
+  if (mostrarPergunta.value && /^[a-zA-Z]$/.test(e.key)) {
+  const tecla = e.key.toUpperCase();
+  if (tecla === perguntaBronze.value.resposta.toUpperCase()) {
+    encerrarPergunta(true);
+  } else {
+    encerrarPergunta(false);
   }
+}
 
   // Responder pergunta prata
-  if (mostrarPerguntaPrata.value && /^[0-9]$/.test(e.key)) {
-    respostaDigitada.value += e.key;
-    if (respostaDigitada.value === String(perguntaPrata.value.resposta)) {
-      encerrarPerguntaPrata(true);
-    } else if (respostaDigitada.value.length >= 2) {
-      encerrarPerguntaPrata(false);
-    }
+  if (mostrarPerguntaPrata.value && /^[a-zA-Z0-9]$/.test(e.key)) {
+  const tecla = e.key.toString().toUpperCase();
+  if (tecla === perguntaPrata.value.resposta.toString().toUpperCase()) {
+    encerrarPerguntaPrata(true);
+  } else {
+    encerrarPerguntaPrata(false);
   }
+}
 
   // Responder pergunta dourada
-  if (mostrarPerguntaDourada.value && /^[a-zA-Z]$/.test(e.key)) {
-    respostaDigitada.value += e.key.toLowerCase();
-    if (respostaDigitada.value.toLowerCase() === String(perguntaDourada.value.resposta).toLowerCase()) {
-      encerrarPerguntaDourada(true);
-    } else if (respostaDigitada.value.length >= 2) {
-      encerrarPerguntaDourada(false);
-    }
+  if (mostrarPerguntaDourada.value && /^[a-zA-Z0-9]$/.test(e.key)) {
+  const tecla = e.key.toString().toUpperCase();
+  if (tecla === perguntaDourada.value.resposta.toString().toUpperCase()) {
+    encerrarPerguntaDourada(true);
+  } else {
+    encerrarPerguntaDourada(false);
   }
+}
+
 
   // Pular HQ no menu
   if (e.key === "Enter" && telaAtual.value === "menu") {
