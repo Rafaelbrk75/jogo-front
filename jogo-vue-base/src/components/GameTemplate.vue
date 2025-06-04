@@ -30,7 +30,7 @@
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
       <component
-        :is="componenteBoss"
+        :is="bossComponent"
         :initialX="bossX"
         @update:x="bossX = $event"
         @fire-power="startBossPower"
@@ -46,7 +46,7 @@
       <!-- Moedas -->
       <img
         v-if="mostrarMoeda"
-        :src="`/moedaBronze${moedaFrame}.png`"
+        :src="moedas.bronze[moedaFrame - 1]"
         alt="Moeda Girando"
         class="moeda-girando"
       />
@@ -95,6 +95,15 @@
         alt="Poder"
         class="poder"
         :style="{ right: poderX + 'px' }"
+      />
+
+      <!-- Renderiza todos os poderes ativos do boss -->
+      <img
+        v-for="(poder, idx) in poderes"
+        :key="idx"
+        :src="poder.sprite"
+        class="poder"
+        :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }"
       />
 
       <!-- Tiro de Laser do Player -->
@@ -171,7 +180,9 @@ const props = defineProps({
   cenario: { type: String, required: true },
   musica: { type: String, required: true },
   bossVidaInicial: { type: Number, default: 3 },
-  bossComponent: { type: Object, required: true }, // Adicione esta linha
+  bossComponent: { type: Object, required: true },
+  perguntas: { type: Object, required: true }, // NOVO
+  moedas: { type: Object, required: true },    // NOVO
 });
 
 // ──────────────────────────────────────────────────────────────
@@ -239,9 +250,9 @@ const perguntaPausandoJogo = ref(false);
 
 const bossVida = ref(props.bossVidaInicial);
 
-const perguntaBronze = { resposta: "7", imagem: "/fase1/imgPerguntaBronze.png" };
-const perguntaPrata = { resposta: "8", imagem: "/fase1/perguntaPrata.png" };
-const perguntaDourada = { resposta: "x", imagem: "/fase1/perguntaDourada.png" };
+const perguntaBronze = computed(() => props.perguntas.bronze);
+const perguntaPrata = computed(() => props.perguntas.prata);
+const perguntaDourada = computed(() => props.perguntas.dourada);
 
 const tiroVisivel = ref(false);
 const tiroX = ref(0);
@@ -254,6 +265,8 @@ let moedaAnimacao = null;
 let animacaoPrata = null;
 let animacaoDourada = null;
 let timerPergunta = null;
+
+const poderes = reactive([]);
 
 // ──────────────────────────────────────────────────────────────
 // Exibe a HQ antes de iniciar o jogo
@@ -326,65 +339,13 @@ function iniciarJogo() {
 // Quando o BossFaseX emitir “fire-power” com { sprite, speed }
 // chamamos esta função para animar o “poder” no canvas
 // ──────────────────────────────────────────────────────────────
-function startBossPower(payload) {
-  // payload = { sprite: string, speed: number }
-  if (poderVisivel.value) return;
-
-  poderVisivel.value = true;
-  poderX.value = 0;
-  poderSprite.value = payload.sprite;
-  const velocidade = payload.speed;
-
-  function animLoop() {
-    if (jogoPausado.value) return;
-    poderX.value += velocidade;
-
-    const pEl = document.querySelector(".poder");
-    const pl = document.querySelector(".player");
-    if (!pEl || !pl) {
-      requestAnimationFrame(animLoop);
-      return;
-    }
-
-    // detecta colisão aproximada
-    const r1Full = pEl.getBoundingClientRect();
-    const r1 = {
-      top: r1Full.top + 20,
-      bottom: r1Full.bottom - 20,
-      left: r1Full.left + 20,
-      right: r1Full.right - 20,
-    };
-    const r2Full = pl.getBoundingClientRect();
-    const r2 = {
-      top: r2Full.top + 20,
-      bottom: r2Full.bottom - 20,
-      left: r2Full.left + 20,
-      right: r2Full.right - 20,
-    };
-
-    if (
-      r1.left < r2.right &&
-      r1.right > r2.left &&
-      r1.top < r2.bottom &&
-      r1.bottom > r2.top &&
-      !invulneravel.value
-    ) {
-      // Dano ao player
-      const idx = vidas.findIndex((v) => v);
-      if (idx !== -1) vidas[idx] = false;
-      poderVisivel.value = false;
-      verificarGameOver();
-      return;
-    }
-
-    if (poderX.value > window.innerWidth) {
-      poderVisivel.value = false;
-      return;
-    }
-    requestAnimationFrame(animLoop);
-  }
-
-  requestAnimationFrame(animLoop);
+function startBossPower({ sprite, speed }) {
+  poderes.push({
+    sprite,
+    x: bossX.value, // posição horizontal do boss
+    y: 100,         // altura fixa igual ao CSS: bottom: 160px;
+    speed,
+  });
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -401,7 +362,7 @@ function onKeyDown(e) {
   // Responder pergunta bronze
   if (mostrarPergunta.value && /^[0-9]$/.test(e.key)) {
     respostaDigitada.value += e.key;
-    if (respostaDigitada.value === perguntaBronze.resposta) {
+    if (respostaDigitada.value === String(perguntaBronze.value.resposta)) {
       encerrarPergunta(true);
     } else if (respostaDigitada.value.length >= 2) {
       encerrarPergunta(false);
@@ -411,7 +372,7 @@ function onKeyDown(e) {
   // Responder pergunta prata
   if (mostrarPerguntaPrata.value && /^[0-9]$/.test(e.key)) {
     respostaDigitada.value += e.key;
-    if (respostaDigitada.value === perguntaPrata.resposta) {
+    if (respostaDigitada.value === String(perguntaPrata.value.resposta)) {
       encerrarPerguntaPrata(true);
     } else if (respostaDigitada.value.length >= 2) {
       encerrarPerguntaPrata(false);
@@ -421,7 +382,7 @@ function onKeyDown(e) {
   // Responder pergunta dourada
   if (mostrarPerguntaDourada.value && /^[a-zA-Z]$/.test(e.key)) {
     respostaDigitada.value += e.key.toLowerCase();
-    if (respostaDigitada.value.toLowerCase() === perguntaDourada.resposta) {
+    if (respostaDigitada.value.toLowerCase() === String(perguntaDourada.value.resposta).toLowerCase()) {
       encerrarPerguntaDourada(true);
     } else if (respostaDigitada.value.length >= 2) {
       encerrarPerguntaDourada(false);
@@ -545,6 +506,38 @@ function gameLoop() {
       }
       iniciarPerguntaDourada();
     });
+  }
+
+  // Atualiza e remove poderes do boss
+  for (let i = poderes.length - 1; i >= 0; i--) {
+    poderes[i].x -= poderes[i].speed;
+
+    const playerEl = document.querySelector(".player");
+    const poderEls = document.querySelectorAll(".poder");
+    const poderEl = poderEls[i];
+    if (playerEl && poderEl) {
+      const rPlayer = playerEl.getBoundingClientRect();
+      const rPoder = poderEl.getBoundingClientRect();
+
+      const colidiu =
+        rPoder.left < rPlayer.right &&
+        rPoder.right > rPlayer.left &&
+        rPoder.top < rPlayer.bottom &&
+        rPoder.bottom > rPlayer.top;
+
+      if (colidiu) {
+        // Remove uma vida
+        const idx = vidas.findIndex((v) => v);
+        if (idx !== -1) vidas[idx] = false;
+        poderes.splice(i, 1);
+        verificarGameOver();
+        continue;
+      }
+    }
+
+    if (poderes[i] && poderes[i].x < -200) {
+      poderes.splice(i, 1);
+    }
   }
 
   frameLoop = requestAnimationFrame(gameLoop);

@@ -24,7 +24,7 @@ const x = ref(props.initialX);
 const y = ref(props.initialY);
 
 // velocidade horizontal (pixels por quadro)
-const speed = 2;
+const speed = 6;
 // força do pulo (valor inicial para velocityY)
 const jumpForce = 30;
 // gravidade (valor subtraído de velocityY a cada iteração)
