@@ -1,9 +1,20 @@
-<!-- Game4.vue -->
 <template>
-    <GameTemplate :bossVidaInicial="7" :cenario="'/cenario4.png'" :musica="'/nivel4.mp3'"
-        @vencerNivel="$emit('vencerNivel')" />
+  <GameTemplate
+    :cenario="cenario"
+    :musica="musica"
+    :bossVidaInicial="bossVidaInicial"
+    :bossComponent="Boss4"
+    @vencerNivel="$emit('vencerNivel')"
+  />
 </template>
 
 <script setup>
-import GameTemplate from './GameTemplate.vue'
+import GameTemplate from "./GameTemplate.vue";
+import Boss4 from "./Boss4.vue";
+
+const emit = defineEmits(["vencerNivel"]);
+
+const cenario = "/fase4/cenario4.png";
+const musica = "/fase4/nivel4.mp3";
+const bossVidaInicial = 7;
 </script>

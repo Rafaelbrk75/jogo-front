@@ -1,136 +1,181 @@
 <template>
-    <div>
-        <!-- Tela de Menu -->
-        <Menu v-if="telaAtual === 'menu'" @start="exibirIntro" />
+  <div>
+    <!-- Tela de Menu -->
+    <Menu v-if="telaAtual === 'menu'" @start="exibirIntro" />
 
-        <!-- HQ de Introdução -->
-        <div v-else-if="telaAtual === 'intro'" class="intro-hq">
-            <img src="/hq-intro.png" class="hq-img" alt="HQ Intro" />
-            <button class="btn-skip" @click="pularIntro">PULAR</button>
-        </div>
-
-        <!-- Tela de Jogo -->
-        <div v-else-if="telaAtual === 'jogo'" class="cenario" :style="{ backgroundImage: `url('${cenario}')` }">
-            <Hud :vidas="vidas" />
-
-            <!-- Sombra do Boss -->
-            <img src="/sombra.png" class="sombra sombra-boss" />
-
-            <!-- Barra de vida do Boss -->
-            <div class="barra-vida">
-                <div class="barra-vida-fill" :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"></div>
-            </div>
-
-            <!-- Boss (o elemento deve ter class="boss") -->
-            <Boss :bossSrc="bossSrc" />
-
-            <!-- Sombra do Player -->
-            <img src="/sombra.png" class="sombra sombra-player"
-                :style="{ left: playerX + 80 + 'px', bottom: '-50px' }" />
-
-            <!-- Moedas -->
-            <img v-if="mostrarMoeda" :src="`/moedaBronze${moedaFrame}.png`" alt="Moeda Girando" class="moeda-girando" />
-            <img v-if="mostrarMoedaPrata" :src="`/moedaPrata${moedaPrataFrame}.png`" alt="Moeda Prata Girando"
-                class="moeda-girando" />
-            <img v-if="mostrarMoedaDourada" :src="`/moedaDourada${moedaDouradaFrame}.png`"
-                class="moeda-girando-dourada" />
-
-            <!-- Perguntas -->
-            <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
-                <img :src="perguntaBronze.imagem" class="img-pergunta" />
-                <div class="contador">{{ tempoRestAnte }}</div>
-            </div>
-
-            <div v-if="mostrarPerguntaPrata" class="pergunta-overlay" @click.stop>
-                <img :src="perguntaPrata.imagem" class="img-pergunta" />
-                <div class="contador">{{ tempoRestAnte }}</div>
-            </div>
-
-            <div v-if="mostrarPerguntaDourada" class="pergunta-overlay" @click.stop>
-                <img :src="perguntaDourada.imagem" class="img-pergunta" />
-                <div class="contador">{{ tempoRestAnte }}</div>
-            </div>
-
-            <!-- Player -->
-            <div class="player-wrapper"
-                :style="{ left: playerX + 'px', bottom: estaAgachado ? '-45px' : jumpY + 'px' }">
-                <Player :jumpY="jumpY" :src="playerSrc" />
-            </div>
-
-            <!-- Poder -->
-            <img v-if="poderVisivel" ref="poder" src="/poder-binario.png" alt="Poder" class="poder"
-                :style="{ right: poderX + 'px' }" />
-
-            <!-- Tiro de Laser do Player -->
-            <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
-                :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
-
-            <!-- Áudios -->
-            <audio ref="somNivel1" :src="musica" loop />
-            <audio ref="somImpacto" src="/somImpacto.mp3" />
-            <audio ref="somGameOver" src="/gameover.mp3" />
-            <audio ref="somAgachando" src="/somAgachando.mp3" />
-            <audio ref="somPulo" src="/somPulo.mp3" />
-            <audio ref="somMoeda" src="/public/somMoeda.wav" />
-            <audio ref="somAcerto" src="/somAcerto.wav" />
-            <audio ref="somPerda" src="/somPerda.mp3" />
-            <audio ref="somRelogio" src="/somRelogio.mp3" />
-
-            <!-- Botão de Som -->
-            <button @click.stop="toggleSom" class="btn-som">
-                <img :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'" alt="Som" />
-            </button>
-
-            <!-- Overlay de Pause -->
-            <div v-if="jogoPausado && !perguntaPausandoJogo" class="pause-overlay">
-                <img src="/telaPause.png" class="img-pause" alt="Pausado" />
-                <button class="btn-continuar" @click.stop="togglePause">
-                    CONTINUAR
-                </button>
-            </div>
-
-            <!-- Tela de Game Over -->
-            <div v-if="gameOver" class="game-over-overlay">
-                <div class="game-over-container">
-                    <img src="/imgGameOver.png" class="img-game-over" alt="Game Over" />
-                    <button class="btn-reiniciar" @click="reiniciarJogo">
-                        REINICIAR
-                    </button>
-                </div>
-            </div>
-        </div>
+    <!-- HQ de Introdução -->
+    <div v-else-if="telaAtual === 'intro'" class="intro-hq">
+      <img src="/fase1/hq-intro.png" class="hq-img" alt="HQ Intro" />
+      <button class="btn-skip" @click="pularIntro">PULAR</button>
     </div>
+
+    <!-- Tela de Jogo -->
+    <div
+      v-else-if="telaAtual === 'jogo'"
+      class="cenario"
+      :style="{ backgroundImage: `url('${cenario}')` }"
+    >
+      <Hud :vidas="vidas" />
+
+      <!-- Sombra do Boss -->
+      <img src="/sombra.png" class="sombra sombra-boss" />
+
+      <!-- Barra de vida do Boss -->
+      <div class="barra-vida">
+        <div
+          class="barra-vida-fill"
+          :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"
+        ></div>
+      </div>
+
+      <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
+      <component
+        :is="componenteBoss"
+        :initialX="bossX"
+        @update:x="bossX = $event"
+        @fire-power="startBossPower"
+      />
+
+      <!-- Sombra do Player -->
+      <img
+        src="/sombra.png"
+        class="sombra sombra-player"
+        :style="{ left: playerX + 80 + 'px', bottom: '-50px' }"
+      />
+
+      <!-- Moedas -->
+      <img
+        v-if="mostrarMoeda"
+        :src="`/moedaBronze${moedaFrame}.png`"
+        alt="Moeda Girando"
+        class="moeda-girando"
+      />
+      <img
+        v-if="mostrarMoedaPrata"
+        :src="`/moedaPrata${moedaPrataFrame}.png`"
+        alt="Moeda Prata Girando"
+        class="moeda-girando"
+      />
+      <img
+        v-if="mostrarMoedaDourada"
+        :src="`/moedaDourada${moedaDouradaFrame}.png`"
+        class="moeda-girando-dourada"
+      />
+
+      <!-- Perguntas -->
+      <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
+        <img :src="perguntaBronze.imagem" class="img-pergunta" />
+        <div class="contador">{{ tempoRestAnte }}</div>
+      </div>
+      <div v-if="mostrarPerguntaPrata" class="pergunta-overlay" @click.stop>
+        <img :src="perguntaPrata.imagem" class="img-pergunta" />
+        <div class="contador">{{ tempoRestAnte }}</div>
+      </div>
+      <div v-if="mostrarPerguntaDourada" class="pergunta-overlay" @click.stop>
+        <img :src="perguntaDourada.imagem" class="img-pergunta" />
+        <div class="contador">{{ tempoRestAnte }}</div>
+      </div>
+
+      <!-- Player (envia posição/estado via eventos emitidos) -->
+      <Player
+        :initialX="playerX"
+        :initialY="jumpY"
+        :pausado="jogoPausado || perguntaPausandoJogo"
+        @update:x="playerX = $event"
+        @update:y="jumpY = $event"
+        @update:direcao="direcao = $event"
+        @update:estado="onPlayerEstado($event)"
+      />
+
+      <!-- Poder (vindo do Boss) -->
+      <img
+        v-if="poderVisivel"
+        ref="poder"
+        :src="poderSprite"
+        alt="Poder"
+        class="poder"
+        :style="{ right: poderX + 'px' }"
+      />
+
+      <!-- Tiro de Laser do Player -->
+      <img
+        v-if="tiroVisivel"
+        src="/impacto_laser_pixelado.png"
+        alt="Tiro de Laser"
+        class="tiro"
+        :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }"
+      />
+
+      <!-- Áudios -->
+      <audio ref="somNivel1" :src="musica" loop />
+      <audio ref="somImpacto" src="/somImpacto.mp3" />
+      <audio ref="somGameOver" src="/gameover.mp3" />
+      <audio ref="somAgachando" src="/somAgachando.mp3" />
+      <audio ref="somPulo" src="/somPulo.mp3" />
+      <audio ref="somMoeda" src="/public/somMoeda.wav" />
+      <audio ref="somAcerto" src="/somAcerto.wav" />
+      <audio ref="somPerda" src="/somPerda.mp3" />
+      <audio ref="somRelogio" src="/somRelogio.mp3" />
+
+      <!-- Botão de Som -->
+      <button @click.stop="toggleSom" class="btn-som">
+        <img
+          :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'"
+          alt="Som"
+        />
+      </button>
+
+      <!-- Overlay de Pause -->
+      <div v-if="jogoPausado" class="pause-overlay">
+        <img src="/telaPause.png" class="img-pause" alt="Pausado" />
+        <button
+          v-if="jogoPausado"
+          class="btn-continuar"
+          @click.stop="togglePause"
+        >
+          CONTINUAR
+        </button>
+      </div>
+
+      <!-- Tela de Game Over -->
+      <div v-if="gameOver" class="game-over-overlay">
+        <div class="game-over-container">
+          <img src="/imgGameOver.png" class="img-game-over" alt="Game Over" />
+          <button class="btn-reiniciar" @click="reiniciarJogo">
+            REINICIAR
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, watch, onBeforeUnmount, onMounted } from "vue";
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  onBeforeUnmount,
+  onMounted,
+} from "vue";
 import Menu from "./Menu.vue";
 import Hud from "./Hud.vue";
 import Player from "./Player.vue";
-import Boss from "./Boss.vue";
+
+// Importamos as fases de Boss
+import BossFase1 from "./Boss1.vue";
+import BossFase2 from "./Boss2.vue";
 
 const props = defineProps({
-    cenario: {
-        type: String,
-        required: true
-    },
-    musica: {
-        type: String,
-        required: true
-    },
-    bossVidaInicial: {
-        type: Number,
-        default: 3
-    },
-    bossSrc: {
-        type: String,
-        required: true
-    }
+  cenario: { type: String, required: true },
+  musica: { type: String, required: true },
+  bossVidaInicial: { type: Number, default: 3 },
+  bossComponent: { type: Object, required: true }, // Adicione esta linha
 });
 
-
 // ──────────────────────────────────────────────────────────────
-// Estados principais
+// Estados principais do GameTemplate
 // ──────────────────────────────────────────────────────────────
 const telaAtual = ref("menu"); // "menu" | "intro" | "jogo"
 let introTimeoutId = null;
@@ -138,11 +183,32 @@ let introTimeoutId = null;
 const vidas = reactive([true, true, true]);
 const playerX = ref(50);
 const jumpY = ref(0);
-const playerSrc = ref("/player.png");
-const bossSrc = ref(props.bossSrc);
+const direcao = ref("direita");
+
+// Essas duas refs são atualizadas pelo evento @update:estado do Player
+const estaAgachado = ref(false);
+const groundedGlob = ref(true);
+
+// Variável que controla em que fase estamos (1 ou 2 neste exemplo)
+const faseAtual = ref(1);
+
+// Computed para eleger o boss correspondente a cada fase
+const componenteBoss = computed(() => {
+  return faseAtual.value === 1 ? BossFase1 : BossFase2;
+});
+
+// posição X do boss (recebida dos eventos @update:x)
+const bossX = ref(1000);
+
+// Tudo relativo ao “poder” do boss
 const poderX = ref(0);
 const poderVisivel = ref(false);
 const invulneravel = ref(false);
+
+// Qual sprite de poder exibir (muda conforme evento “fire-power”)
+const poderSprite = ref("/poderFase1.png");
+
+// Áudios e som
 const somNivel1 = ref(null);
 const somImpacto = ref(null);
 const somGameOver = ref(null);
@@ -171,978 +237,851 @@ const respostaDigitada = ref("");
 const tempoRestAnte = ref(10);
 const perguntaPausandoJogo = ref(false);
 
-const estaAgachado = ref(false);
-const direcao = ref("direita");
-
-const speed = 5;
-const jumpForce = 37;
-const gravity = 0.8;
-const grounded = ref(true);
-
-let velocityY = 0;
-let frameLoop = null;
-let bossAnim = null;
-let poderLoop = null;
-let moedaAnimacao = null;
-let animacaoPrata = null;
-let animacaoDourada = null;
-let timerPergunta = null;
-const poderAnims = [];
-const moving = { left: false, right: false, down: false };
-
-// ──────────────────────────────────────────────────────────────
-// Estado de vida do BOSS
-// ──────────────────────────────────────────────────────────────
 const bossVida = ref(props.bossVidaInicial);
 
-// ──────────────────────────────────────────────────────────────
-// Configurações de pergunta por fase
-// ──────────────────────────────────────────────────────────────
-const perguntaBronze = { resposta: "7", imagem: "/imgPerguntaBronze.png" };
-const perguntaPrata = { resposta: "8", imagem: "/perguntaPrata.png" };
-const perguntaDourada = { resposta: "x", imagem: "/perguntaDourada.png" };
+const perguntaBronze = { resposta: "7", imagem: "/fase1/imgPerguntaBronze.png" };
+const perguntaPrata = { resposta: "8", imagem: "/fase1/perguntaPrata.png" };
+const perguntaDourada = { resposta: "x", imagem: "/fase1/perguntaDourada.png" };
 
-// ──────────────────────────────────────────────────────────────
-// Estados do TIRO (laser do player)
-// ──────────────────────────────────────────────────────────────
 const tiroVisivel = ref(false);
 const tiroX = ref(0);
 const tiroY = ref(0);
 const tiroSpeed = 15;
 let tiroAnimFrame = null;
 
+let frameLoop = null;
+let moedaAnimacao = null;
+let animacaoPrata = null;
+let animacaoDourada = null;
+let timerPergunta = null;
+
 // ──────────────────────────────────────────────────────────────
 // Exibe a HQ antes de iniciar o jogo
 // ──────────────────────────────────────────────────────────────
 function exibirIntro() {
-    telaAtual.value = "intro";
-    clearTimeout(introTimeoutId);
-    introTimeoutId = setTimeout(() => {
-        if (telaAtual.value === "intro") iniciarJogo();
-    }, 8000);
+  telaAtual.value = "intro";
+  clearTimeout(introTimeoutId);
+  introTimeoutId = setTimeout(() => {
+    if (telaAtual.value === "intro") iniciarJogo();
+  }, 8000);
 }
 
 // Pula a HQ e inicia imediatamente
 function pularIntro() {
-    clearTimeout(introTimeoutId);
-    iniciarJogo();
+  clearTimeout(introTimeoutId);
+  iniciarJogo();
 }
 
 // ──────────────────────────────────────────────────────────────
-// Inicia o jogo (animações, loop, sons, etc.)
+// Inicia o jogo (setting up loops, sons, etc.)
 // ──────────────────────────────────────────────────────────────
 function iniciarJogo() {
-    telaAtual.value = "jogo";
+  telaAtual.value = "jogo";
 
-    // Reinicia música de fundo
-    if (somNivel1.value) {
-        somNivel1.value.currentTime = 0;
-        somNivel1.value.loop = true;
-        somNivel1.value.play().catch(() => { });
-    }
-    somAtivo.value = true;
-    gameOver.value = false;
+  // Tocar música de fundo
+  if (somNivel1.value) {
+    somNivel1.value.currentTime = 0;
+    somNivel1.value.loop = true;
+    somNivel1.value.play().catch(() => {});
+  }
+  somAtivo.value = true;
+  gameOver.value = false;
 
-    // Reset de estado
-    vidas.splice(0, vidas.length, true, true, true);
-    playerX.value = 50;
-    jumpY.value = 0;
-    poderX.value = 0;
-    poderVisivel.value = false;
-    moedaFrame.value = 1;
-    moedaPrataFrame.value = 1;
-    moedaDouradaFrame.value = 1;
-    mostrarMoeda.value = false;
-    mostrarMoedaPrata.value = false;
-    mostrarMoedaDourada.value = false;
-    mostrarPergunta.value = false;
-    mostrarPerguntaPrata.value = false;
-    mostrarPerguntaDourada.value = false;
-    respostaDigitada.value = "";
-    tempoRestAnte.value = 10;
-    estaAgachado.value = false;
-    grounded.value = true;
-    velocityY = 0;
+  // Resetar tudo
+  vidas.splice(0, vidas.length, true, true, true);
+  playerX.value = 50;
+  jumpY.value = 0;
+  bossX.value = 1000;
+  poderX.value = 0;
+  poderVisivel.value = false;
+  moedaFrame.value = 1;
+  moedaPrataFrame.value = 1;
+  moedaDouradaFrame.value = 1;
+  mostrarMoeda.value = false;
+  mostrarMoedaPrata.value = false;
+  mostrarMoedaDourada.value = false;
+  mostrarPergunta.value = false;
+  mostrarPerguntaPrata.value = false;
+  mostrarPerguntaDourada.value = false;
+  respostaDigitada.value = "";
+  tempoRestAnte.value = 10;
+  estaAgachado.value = false;
+  groundedGlob.value = true;
 
-    // Redefine vida do Boss com base na prop
-    bossVida.value = props.bossVidaInicial;
+  bossVida.value = props.bossVidaInicial;
 
-    // Listeners de teclado e loop de jogo
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
-    frameLoop = requestAnimationFrame(gameLoop);
+  // Inicia loop de jogo (colisões e perguntas)
+  frameLoop = requestAnimationFrame(gameLoop);
 
-    // Animação de sprite do Boss (troca entre boss.png e boss2.png)
-    bossAnim = setInterval(() => {
-        bossSrc.value = bossSrc.value.endsWith("2.png") ? "/boss.png" : "/boss2.png";
-    }, 300);
-
-    // Lógica do poder “vindo do Boss”
-    poderLoop = setInterval(() => {
-        if (jogoPausado.value) return;
-        poderVisivel.value = true;
-        poderX.value = 0;
-        let podePerder = true;
-
-        function animLoop() {
-            if (jogoPausado.value) return;
-            poderX.value += 10;
-            const pEl = document.querySelector(".poder");
-            const pl = document.querySelector(".player");
-
-            if (pEl && pl && podePerder && !invulneravel.value) {
-                const r1Full = pEl.getBoundingClientRect();
-                const r1 = {
-                    top: r1Full.top + 20,
-                    bottom: r1Full.bottom - 20,
-                    left: r1Full.left + 20,
-                    right: r1Full.right - 20,
-                };
-                const r2Full = pl.getBoundingClientRect();
-                const r2 = {
-                    top: r2Full.top + 20,
-                    bottom: r2Full.bottom - 20,
-                    left: r2Full.left + 20,
-                    right: r2Full.right - 20,
-                };
-
-                if (
-                    r1.left < r2.right &&
-                    r1.right > r2.left &&
-                    r1.top < r2.bottom &&
-                    r1.bottom > r2.top
-                ) {
-                    const idx = vidas.findIndex((v) => v);
-                    if (idx !== -1) vidas[idx] = false;
-                    podePerder = false;
-                    if (somImpacto.value && somAtivo.value) {
-                        somImpacto.value.volume = 1.0;
-                        somImpacto.value.currentTime = 0;
-                        somImpacto.value.play().catch(() => { });
-                    }
-                    poderVisivel.value = false;
-                    verificarGameOver();
-                    return;
-                }
-            }
-
-            if (poderX.value > window.innerWidth) {
-                poderVisivel.value = false;
-                return;
-            }
-
-            requestAnimationFrame(animLoop);
-        }
-
-        requestAnimationFrame(animLoop);
-    }, 5000);
-
-    // Mostra moeda bronze após 7s
-    setTimeout(() => {
-        mostrarMoeda.value = true;
-        moedaAnimacao = setInterval(() => {
-            moedaFrame.value = moedaFrame.value === 4 ? 1 : moedaFrame.value + 1;
-        }, 150);
-    }, 7000);
+  // Mostrar moeda bronze após 7s
+  setTimeout(() => {
+    mostrarMoeda.value = true;
+    moedaAnimacao = setInterval(() => {
+      moedaFrame.value = moedaFrame.value === 4 ? 1 : moedaFrame.value + 1;
+    }, 150);
+  }, 7000);
 }
 
 // ──────────────────────────────────────────────────────────────
-// Tratamento de teclas
+// Quando o BossFaseX emitir “fire-power” com { sprite, speed }
+// chamamos esta função para animar o “poder” no canvas
 // ──────────────────────────────────────────────────────────────
-function onKeyDown(e) {
-    if (jogoPausado.value || gameOver.value) return;
+function startBossPower(payload) {
+  // payload = { sprite: string, speed: number }
+  if (poderVisivel.value) return;
 
-    if (e.key === "a") {
-        moving.left = true;
-        direcao.value = "esquerda";
-    }
-    if (e.key === "d") {
-        moving.right = true;
-        direcao.value = "direita";
-    }
-    if (e.key === "s") {
-        moving.down = true;
-        if (somAgachando.value && somAtivo.value) {
-            somAgachando.value.currentTime = 0;
-            somAgachando.value.play().catch(() => { });
-        }
-    }
-    if ((e.key === " " || e.code === "Space") && grounded.value) {
-        velocityY = jumpForce;
-        grounded.value = false;
-        if (somPulo.value && somAtivo.value) {
-            somPulo.value.currentTime = 0;
-            somPulo.value.play().catch(() => { });
-        }
-    }
-    if (e.key === "Enter" && telaAtual.value === "menu") {
-        exibirIntro();
+  poderVisivel.value = true;
+  poderX.value = 0;
+  poderSprite.value = payload.sprite;
+  const velocidade = payload.speed;
+
+  function animLoop() {
+    if (jogoPausado.value) return;
+    poderX.value += velocidade;
+
+    const pEl = document.querySelector(".poder");
+    const pl = document.querySelector(".player");
+    if (!pEl || !pl) {
+      requestAnimationFrame(animLoop);
+      return;
     }
 
-    // Respostas das perguntas
-    if (mostrarPergunta.value && /^[0-9]$/.test(e.key)) {
-        respostaDigitada.value += e.key;
-        if (respostaDigitada.value === perguntaBronze.resposta) encerrarPergunta(true);
-        else if (respostaDigitada.value.length >= 2) encerrarPergunta(false);
-    }
-    if (mostrarPerguntaPrata.value && /^[0-9]$/.test(e.key)) {
-        respostaDigitada.value += e.key;
-        if (respostaDigitada.value === perguntaPrata.resposta)
-            encerrarPerguntaPrata(true);
-        else if (respostaDigitada.value.length >= 2)
-            encerrarPerguntaPrata(false);
-    }
-    if (mostrarPerguntaDourada.value && /^[a-zA-Z]$/.test(e.key)) {
-        respostaDigitada.value += e.key.toLowerCase();
-        if (respostaDigitada.value.toLowerCase() === perguntaDourada.resposta)
-            encerrarPerguntaDourada(true);
-        else if (respostaDigitada.value.length >= 2)
-            encerrarPerguntaDourada(false);
-    }
-
-    if (e.key === "Escape") togglePause();
-
-    // Disparar tiro com F
-    if (e.key.toLowerCase() === "f") {
-        dispararTiro();
-    }
-}
-
-function onKeyUp(e) {
-    if (jogoPausado.value || gameOver.value) return;
-    if (e.key === "a") moving.left = false;
-    if (e.key === "d") moving.right = false;
-    if (e.key === "s") {
-        moving.down = false;
-        if (somAgachando.value) {
-            somAgachando.value.pause();
-            somAgachando.value.currentTime = 0;
-        }
-    }
-}
-
-// ──────────────────────────────────────────────────────────────
-// Função que dispara o laser (imagem “impacto_laser_pixelado.png”)
-// ──────────────────────────────────────────────────────────────
-function dispararTiro() {
-    if (tiroVisivel.value) return;
-
-    tiroX.value = playerX.value + 60;
-    tiroY.value = jumpY.value + 40;
-    tiroVisivel.value = true;
-
-    function animarTiro() {
-        if (jogoPausado.value || gameOver.value) {
-            cancelAnimationFrame(tiroAnimFrame);
-            return;
-        }
-
-        tiroX.value += tiroSpeed;
-
-        // Colisão com o boss
-        const bossEl = document.querySelector(".boss");
-        const tiroEl = document.querySelector(".tiro");
-        if (bossEl && tiroEl) {
-            const rBoss = bossEl.getBoundingClientRect();
-            const rTiro = tiroEl.getBoundingClientRect();
-            const houveColisao =
-                rTiro.left < rBoss.right &&
-                rTiro.right > rBoss.left &&
-                rTiro.top < rBoss.bottom &&
-                rTiro.bottom > rBoss.top;
-
-            if (houveColisao) {
-                if (bossVida.value > 0) {
-                    bossVida.value--;
-                    console.log("Boss foi atingido! Vida restante:", bossVida.value);
-                }
-                tiroVisivel.value = false;
-                cancelAnimationFrame(tiroAnimFrame);
-
-                if (bossVida.value <= 0) {
-                    emitirVitoria();
-                }
-                return;
-            }
-        }
-
-        const larguraTiro = 180;
-        if (tiroX.value > window.innerWidth + larguraTiro) {
-            tiroVisivel.value = false;
-            cancelAnimationFrame(tiroAnimFrame);
-            return;
-        }
-
-        tiroAnimFrame = requestAnimationFrame(animarTiro);
-    }
-
-    tiroAnimFrame = requestAnimationFrame(animarTiro);
-}
-
-// ──────────────────────────────────────────────────────────────
-// Loop principal do jogo
-// ──────────────────────────────────────────────────────────────
-function gameLoop() {
-    if (jogoPausado.value || perguntaPausandoJogo.value || gameOver.value)
-        return;
-
-    // Movimento horizontal
-    if (moving.left) playerX.value = Math.max(0, playerX.value - speed);
-    if (moving.right)
-        playerX.value = Math.min(window.innerWidth - 100, playerX.value + speed);
-
-    // Lógica de pulo, gravidade e sprite
-    if (!grounded.value) {
-        velocityY -= gravity;
-        jumpY.value += velocityY;
-
-        playerSrc.value =
-            direcao.value === "esquerda" ? "/jumpVoltando.jpg" : "/playerGiro.png";
-        estaAgachado.value = false;
-
-        if (jumpY.value <= 0) {
-            jumpY.value = 0;
-            velocityY = 0;
-            grounded.value = true;
-        }
-    } else {
-        jumpY.value = 0;
-        if (moving.down) {
-            estaAgachado.value = true;
-            playerSrc.value =
-                moving.left || direcao.value === "esquerda"
-                    ? "/agachado2.png"
-                    : "/agachado.png";
-        } else if (moving.left) {
-            estaAgachado.value = false;
-            playerSrc.value = "/bonecoVoltando.jpg";
-        } else if (moving.right) {
-            estaAgachado.value = false;
-            playerSrc.value = "/player.png";
-        } else {
-            estaAgachado.value = false;
-            playerSrc.value =
-                direcao.value === "esquerda" ? "/bonecoVoltando.jpg" : "/player.png";
-        }
-    }
-
-    // Colisão com moedas
-    const checarColisaoMoeda = (selector, onCollect) => {
-        const moedaEl = document.querySelector(selector);
-        const playerEl = document.querySelector(".player");
-        if (moedaEl && playerEl) {
-            const r1 = moedaEl.getBoundingClientRect();
-            const r2 = playerEl.getBoundingClientRect();
-            const colidiu =
-                r1.left < r2.right &&
-                r1.right > r2.left &&
-                r1.top < r2.bottom &&
-                r1.bottom > r2.top;
-            if (colidiu) onCollect();
-        }
+    // detecta colisão aproximada
+    const r1Full = pEl.getBoundingClientRect();
+    const r1 = {
+      top: r1Full.top + 20,
+      bottom: r1Full.bottom - 20,
+      left: r1Full.left + 20,
+      right: r1Full.right - 20,
+    };
+    const r2Full = pl.getBoundingClientRect();
+    const r2 = {
+      top: r2Full.top + 20,
+      bottom: r2Full.bottom - 20,
+      left: r2Full.left + 20,
+      right: r2Full.right - 20,
     };
 
-    if (mostrarMoeda.value) {
-        checarColisaoMoeda(".moeda-girando", () => {
-            mostrarMoeda.value = false;
-            if (somMoeda.value && somAtivo.value) {
-                somMoeda.value.currentTime = 0;
-                somMoeda.value.play().catch(() => { });
-            }
-            iniciarPergunta();
-        });
-    }
-    if (mostrarMoedaPrata.value) {
-        checarColisaoMoeda(".moeda-girando", () => {
-            mostrarMoedaPrata.value = false;
-            if (somMoeda.value && somAtivo.value) {
-                somMoeda.value.currentTime = 0;
-                somMoeda.value.play().catch(() => { });
-            }
-            iniciarPerguntaPrata();
-        });
-    }
-    if (mostrarMoedaDourada.value) {
-        checarColisaoMoeda(".moeda-girando-dourada", () => {
-            mostrarMoedaDourada.value = false;
-            if (somMoeda.value && somAtivo.value) {
-                somMoeda.value.currentTime = 0;
-                somMoeda.value.play().catch(() => { });
-            }
-            iniciarPerguntaDourada();
-        });
+    if (
+      r1.left < r2.right &&
+      r1.right > r2.left &&
+      r1.top < r2.bottom &&
+      r1.bottom > r2.top &&
+      !invulneravel.value
+    ) {
+      // Dano ao player
+      const idx = vidas.findIndex((v) => v);
+      if (idx !== -1) vidas[idx] = false;
+      poderVisivel.value = false;
+      verificarGameOver();
+      return;
     }
 
-    frameLoop = requestAnimationFrame(gameLoop);
+    if (poderX.value > window.innerWidth) {
+      poderVisivel.value = false;
+      return;
+    }
+    requestAnimationFrame(animLoop);
+  }
+
+  requestAnimationFrame(animLoop);
 }
 
 // ──────────────────────────────────────────────────────────────
-// Perguntas e encerramento
+// Tratamento de teclas para o jogo (pausar, respostas, tiro)
 // ──────────────────────────────────────────────────────────────
-function iniciarPergunta() {
-    mostrarPergunta.value = true;
-    respostaDigitada.value = "";
-    tempoRestAnte.value = 10;
-    perguntaPausandoJogo.value = true;
-    if (somRelogio.value && somAtivo.value) {
-        somRelogio.value.currentTime = 0;
-        somRelogio.value.play().catch(() => { });
+function onKeyDown(e) {
+  if (e.key === "Escape") {
+    togglePause();
+    return;
+  }
+
+  if (jogoPausado.value || gameOver.value) return;
+
+  // Responder pergunta bronze
+  if (mostrarPergunta.value && /^[0-9]$/.test(e.key)) {
+    respostaDigitada.value += e.key;
+    if (respostaDigitada.value === perguntaBronze.resposta) {
+      encerrarPergunta(true);
+    } else if (respostaDigitada.value.length >= 2) {
+      encerrarPergunta(false);
+    }
+  }
+
+  // Responder pergunta prata
+  if (mostrarPerguntaPrata.value && /^[0-9]$/.test(e.key)) {
+    respostaDigitada.value += e.key;
+    if (respostaDigitada.value === perguntaPrata.resposta) {
+      encerrarPerguntaPrata(true);
+    } else if (respostaDigitada.value.length >= 2) {
+      encerrarPerguntaPrata(false);
+    }
+  }
+
+  // Responder pergunta dourada
+  if (mostrarPerguntaDourada.value && /^[a-zA-Z]$/.test(e.key)) {
+    respostaDigitada.value += e.key.toLowerCase();
+    if (respostaDigitada.value.toLowerCase() === perguntaDourada.resposta) {
+      encerrarPerguntaDourada(true);
+    } else if (respostaDigitada.value.length >= 2) {
+      encerrarPerguntaDourada(false);
+    }
+  }
+
+  // Pular HQ no menu
+  if (e.key === "Enter" && telaAtual.value === "menu") {
+    exibirIntro();
+  }
+
+  // Disparar tiro
+  if (e.key.toLowerCase() === "f") {
+    dispararTiro();
+  }
+}
+
+function onKeyUp(_) {
+  // nada aqui
+}
+
+// ──────────────────────────────────────────────────────────────
+// Função que dispara o laser (tiro do player)
+// ──────────────────────────────────────────────────────────────
+function dispararTiro() {
+  if (tiroVisivel.value) return;
+  tiroX.value = playerX.value + 60;
+  tiroY.value = jumpY.value + 40;
+  tiroVisivel.value = true;
+
+  function animarTiro() {
+    if (jogoPausado.value || gameOver.value) {
+      cancelAnimationFrame(tiroAnimFrame);
+      return;
+    }
+    tiroX.value += tiroSpeed;
+
+    const bossEl = document.querySelector(".boss");
+    const tiroEl = document.querySelector(".tiro");
+    if (bossEl && tiroEl) {
+      const rBoss = bossEl.getBoundingClientRect();
+      const rTiro = tiroEl.getBoundingClientRect();
+      const houveColisao =
+        rTiro.left < rBoss.right &&
+        rTiro.right > rBoss.left &&
+        rTiro.top < rBoss.bottom &&
+        rTiro.bottom > rBoss.top;
+
+      if (houveColisao) {
+        if (bossVida.value > 0) {
+          bossVida.value--;
+        }
+        tiroVisivel.value = false;
+        cancelAnimationFrame(tiroAnimFrame);
+        if (bossVida.value <= 0) {
+          emitirVitoria();
+        }
+        return;
+      }
     }
 
-    timerPergunta = setInterval(() => {
-        tempoRestAnte.value--;
-        if (tempoRestAnte.value <= 0) {
-            encerrarPergunta(false);
-        }
-    }, 1000);
+    if (tiroX.value > window.innerWidth + 180) {
+      tiroVisivel.value = false;
+      cancelAnimationFrame(tiroAnimFrame);
+      return;
+    }
+    tiroAnimFrame = requestAnimationFrame(animarTiro);
+  }
+  tiroAnimFrame = requestAnimationFrame(animarTiro);
+}
+
+// ──────────────────────────────────────────────────────────────
+// Loop principal do jogo (colisões com moedas e trigger de perguntas)
+// ──────────────────────────────────────────────────────────────
+function gameLoop() {
+  if (jogoPausado.value || perguntaPausandoJogo.value || gameOver.value)
+    return;
+
+  // Colisão com moeda bronze
+  const checarColisaoMoeda = (selector, onCollect) => {
+    const moedaEl = document.querySelector(selector);
+    const playerEl = document.querySelector(".player");
+    if (moedaEl && playerEl) {
+      const r1 = moedaEl.getBoundingClientRect();
+      const r2 = playerEl.getBoundingClientRect();
+      const colidiu =
+        r1.left < r2.right &&
+        r1.right > r2.left &&
+        r1.top < r2.bottom &&
+        r1.bottom > r2.top;
+      if (colidiu) onCollect();
+    }
+  };
+
+  if (mostrarMoeda.value) {
+    checarColisaoMoeda(".moeda-girando", () => {
+      mostrarMoeda.value = false;
+      if (somMoeda.value && somAtivo.value) {
+        somMoeda.value.currentTime = 0;
+        somMoeda.value.play().catch(() => {});
+      }
+      iniciarPergunta();
+    });
+  }
+  if (mostrarMoedaPrata.value) {
+    checarColisaoMoeda(".moeda-girando", () => {
+      mostrarMoedaPrata.value = false;
+      if (somMoeda.value && somAtivo.value) {
+        somMoeda.value.currentTime = 0;
+        somMoeda.value.play().catch(() => {});
+      }
+      iniciarPerguntaPrata();
+    });
+  }
+  if (mostrarMoedaDourada.value) {
+    checarColisaoMoeda(".moeda-girando-dourada", () => {
+      mostrarMoedaDourada.value = false;
+      if (somMoeda.value && somAtivo.value) {
+        somMoeda.value.currentTime = 0;
+        somMoeda.value.play().catch(() => {});
+      }
+      iniciarPerguntaDourada();
+    });
+  }
+
+  frameLoop = requestAnimationFrame(gameLoop);
+}
+
+// ──────────────────────────────────────────────────────────────
+// Pergunta Bronze
+// ──────────────────────────────────────────────────────────────
+function iniciarPergunta() {
+  mostrarPergunta.value = true;
+  respostaDigitada.value = "";
+  tempoRestAnte.value = 10;
+  perguntaPausandoJogo.value = true;
+  if (somRelogio.value && somAtivo.value) {
+    somRelogio.value.currentTime = 0;
+    somRelogio.value.play().catch(() => {});
+  }
+
+  timerPergunta = setInterval(() => {
+    tempoRestAnte.value--;
+    if (tempoRestAnte.value <= 0) {
+      encerrarPergunta(false);
+    }
+  }, 1000);
 }
 
 function encerrarPergunta(acertou) {
-    if (!mostrarPergunta.value) return;
-    clearInterval(timerPergunta);
-    mostrarPergunta.value = false;
-    perguntaPausandoJogo.value = false;
-    if (somRelogio.value) somRelogio.value.pause();
+  if (!mostrarPergunta.value) return;
+  clearInterval(timerPergunta);
+  mostrarPergunta.value = false;
+  perguntaPausandoJogo.value = false;
+  if (somRelogio.value) somRelogio.value.pause();
 
-    if (somAtivo.value) {
-        if (acertou && somAcerto.value) {
-            somAcerto.value.currentTime = 0;
-            somAcerto.value.play().catch(() => { });
-        } else if (!acertou && somPerda.value) {
-            somPerda.value.currentTime = 0;
-            somPerda.value.play().catch(() => { });
-            const idx = vidas.findIndex((v) => v);
-            if (idx !== -1) vidas[idx] = false;
-            verificarGameOver();
-        }
+  if (somAtivo.value) {
+    if (acertou && somAcerto.value) {
+      somAcerto.value.currentTime = 0;
+      somAcerto.value.play().catch(() => {});
+    } else if (!acertou && somPerda.value) {
+      somPerda.value.currentTime = 0;
+      somPerda.value.play().catch(() => {});
+      const idx = vidas.findIndex((v) => v);
+      if (idx !== -1) vidas[idx] = false;
+      verificarGameOver();
     }
+  }
 
-    if (!grounded.value) {
-        jumpY.value = 0;
-        grounded.value = true;
-        velocityY = 0;
-    }
+  frameLoop = requestAnimationFrame(gameLoop);
 
-    frameLoop = requestAnimationFrame(gameLoop);
-
-    // Aparece moeda prata após 2s
-    setTimeout(() => {
-        mostrarMoedaPrata.value = true;
-        moedaPrataFrame.value = 1;
-        animacaoPrata = setInterval(() => {
-            moedaPrataFrame.value =
-                moedaPrataFrame.value === 4 ? 1 : moedaPrataFrame.value + 1;
-        }, 150);
-    }, 2000);
+  // Após 2s, aparece moeda prata
+  setTimeout(() => {
+    mostrarMoedaPrata.value = true;
+    moedaPrataFrame.value = 1;
+    animacaoPrata = setInterval(() => {
+      moedaPrataFrame.value =
+        moedaPrataFrame.value === 4 ? 1 : moedaPrataFrame.value + 1;
+    }, 150);
+  }, 2000);
 }
 
+// ──────────────────────────────────────────────────────────────
+// Pergunta Prata
+// ──────────────────────────────────────────────────────────────
 function iniciarPerguntaPrata() {
-    mostrarPerguntaPrata.value = true;
-    respostaDigitada.value = "";
-    tempoRestAnte.value = 10;
-    perguntaPausandoJogo.value = true;
-    if (somRelogio.value && somAtivo.value) {
-        somRelogio.value.currentTime = 0;
-        somRelogio.value.play().catch(() => { });
-    }
+  mostrarPerguntaPrata.value = true;
+  respostaDigitada.value = "";
+  tempoRestAnte.value = 10;
+  perguntaPausandoJogo.value = true;
+  if (somRelogio.value && somAtivo.value) {
+    somRelogio.value.currentTime = 0;
+    somRelogio.value.play().catch(() => {});
+  }
 
-    timerPergunta = setInterval(() => {
-        tempoRestAnte.value--;
-        if (tempoRestAnte.value <= 0) {
-            encerrarPerguntaPrata(false);
-        }
-    }, 1000);
+  timerPergunta = setInterval(() => {
+    tempoRestAnte.value--;
+    if (tempoRestAnte.value <= 0) {
+      encerrarPerguntaPrata(false);
+    }
+  }, 1000);
 }
 
 function encerrarPerguntaPrata(acertou) {
-    if (!mostrarPerguntaPrata.value) return;
-    clearInterval(timerPergunta);
-    mostrarPerguntaPrata.value = false;
-    perguntaPausandoJogo.value = false;
-    if (somRelogio.value) somRelogio.value.pause();
+  if (!mostrarPerguntaPrata.value) return;
+  clearInterval(timerPergunta);
+  mostrarPerguntaPrata.value = false;
+  perguntaPausandoJogo.value = false;
+  if (somRelogio.value) somRelogio.value.pause();
 
-    if (somAtivo.value) {
-        if (acertou && somAcerto.value) {
-            somAcerto.value.currentTime = 0;
-            somAcerto.value.play().catch(() => { });
-        } else if (!acertou && somPerda.value) {
-            somPerda.value.currentTime = 0;
-            somPerda.value.play().catch(() => { });
-            const idx = vidas.findIndex((v) => v);
-            if (idx !== -1) vidas[idx] = false;
-            verificarGameOver();
-        }
+  if (somAtivo.value) {
+    if (acertou && somAcerto.value) {
+      somAcerto.value.currentTime = 0;
+      somAcerto.value.play().catch(() => {});
+    } else if (!acertou && somPerda.value) {
+      somPerda.value.currentTime = 0;
+      somPerda.value.play().catch(() => {});
+      const idx = vidas.findIndex((v) => v);
+      if (idx !== -1) vidas[idx] = false;
+      verificarGameOver();
     }
+  }
 
-    if (!grounded.value) {
-        jumpY.value = 0;
-        grounded.value = true;
-        velocityY = 0;
-    }
+  frameLoop = requestAnimationFrame(gameLoop);
 
-    frameLoop = requestAnimationFrame(gameLoop);
-
-    // Aparece moeda dourada após 4s
-    setTimeout(() => {
-        mostrarMoedaDourada.value = true;
-        moedaDouradaFrame.value = 1;
-        animacaoDourada = setInterval(() => {
-            moedaDouradaFrame.value =
-                moedaDouradaFrame.value === 4 ? 1 : moedaDouradaFrame.value + 1;
-        }, 150);
-    }, 4000);
+  // Após 4s, aparece moeda dourada
+  setTimeout(() => {
+    mostrarMoedaDourada.value = true;
+    moedaDouradaFrame.value = 1;
+    animacaoDourada = setInterval(() => {
+      moedaDouradaFrame.value =
+        moedaDouradaFrame.value === 4 ? 1 : moedaDouradaFrame.value + 1;
+    }, 150);
+  }, 4000);
 }
 
+// ──────────────────────────────────────────────────────────────
+// Pergunta Dourada
+// ──────────────────────────────────────────────────────────────
 function iniciarPerguntaDourada() {
-    mostrarPerguntaDourada.value = true;
-    respostaDigitada.value = "";
-    tempoRestAnte.value = 10;
-    perguntaPausandoJogo.value = true;
-    if (somRelogio.value && somAtivo.value) {
-        somRelogio.value.currentTime = 0;
-        somRelogio.value.play().catch(() => { });
-    }
+  mostrarPerguntaDourada.value = true;
+  respostaDigitada.value = "";
+  tempoRestAnte.value = 10;
+  perguntaPausandoJogo.value = true;
+  if (somRelogio.value && somAtivo.value) {
+    somRelogio.value.currentTime = 0;
+    somRelogio.value.play().catch(() => {});
+  }
 
-    timerPergunta = setInterval(() => {
-        tempoRestAnte.value--;
-        if (tempoRestAnte.value <= 0) {
-            encerrarPerguntaDourada(false);
-        }
-    }, 1000);
+  timerPergunta = setInterval(() => {
+    tempoRestAnte.value--;
+    if (tempoRestAnte.value <= 0) {
+      encerrarPerguntaDourada(false);
+    }
+  }, 1000);
 }
 
 function encerrarPerguntaDourada(acertou) {
-    if (!mostrarPerguntaDourada.value) return;
-    clearInterval(timerPergunta);
-    mostrarPerguntaDourada.value = false;
-    perguntaPausandoJogo.value = false;
-    if (somRelogio.value) somRelogio.value.pause();
+  if (!mostrarPerguntaDourada.value) return;
+  clearInterval(timerPergunta);
+  mostrarPerguntaDourada.value = false;
+  perguntaPausandoJogo.value = false;
+  if (somRelogio.value) somRelogio.value.pause();
 
-    if (somAtivo.value) {
-        if (acertou && somAcerto.value) {
-            somAcerto.value.currentTime = 0;
-            somAcerto.value.play().catch(() => { });
-        } else if (!acertou && somPerda.value) {
-            somPerda.value.currentTime = 0;
-            somPerda.value.play().catch(() => { });
-            let perdidas = 0;
-            for (let i = 0; i < vidas.length && perdidas < 3; i++) {
-                if (vidas[i]) {
-                    vidas[i] = false;
-                    perdidas++;
-                }
-            }
-            verificarGameOver();
+  if (somAtivo.value) {
+    if (acertou && somAcerto.value) {
+      somAcerto.value.currentTime = 0;
+      somAcerto.value.play().catch(() => {});
+    } else if (!acertou && somPerda.value) {
+      somPerda.value.currentTime = 0;
+      somPerda.value.play().catch(() => {});
+      let perdidas = 0;
+      for (let i = 0; i < vidas.length && perdidas < 3; i++) {
+        if (vidas[i]) {
+          vidas[i] = false;
+          perdidas++;
         }
+      }
+      verificarGameOver();
     }
+  }
 
-    frameLoop = requestAnimationFrame(gameLoop);
+  frameLoop = requestAnimationFrame(gameLoop);
 }
 
 // ──────────────────────────────────────────────────────────────
 // Verifica Game Over
 // ──────────────────────────────────────────────────────────────
 function verificarGameOver() {
-    if (vidas.every((v) => !v)) {
-        gameOver.value = true;
-        limparJogo();
-        if (somNivel1.value) somNivel1.value.pause();
-        if (somGameOver.value && somAtivo.value) {
-            somGameOver.value.currentTime = 0;
-            somGameOver.value.play().catch(() => { });
-        }
+  if (vidas.every((v) => !v)) {
+    gameOver.value = true;
+    limparJogo();
+    if (somNivel1.value) somNivel1.value.pause();
+    if (somGameOver.value && somAtivo.value) {
+      somGameOver.value.currentTime = 0;
+      somGameOver.value.play().catch(() => {});
     }
+  }
 }
 
 // ──────────────────────────────────────────────────────────────
-// Reemitir vitória de fase
+// Emitir Vitória de Fase
 // ──────────────────────────────────────────────────────────────
 const emit = defineEmits(["vencerNivel"]);
 function emitirVitoria() {
-    emit("vencerNivel");
+  emit("vencerNivel");
+  // Ao vencer a fase, você pode incrementar `faseAtual.value++` para mudar o boss:
+  faseAtual.value++;
 }
 
 // ──────────────────────────────────────────────────────────────
 // Reiniciar Jogo
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
-    vidas.splice(0, vidas.length, true, true, true);
-    mostrarMoeda.value = false;
-    mostrarMoedaPrata.value = false;
-    mostrarMoedaDourada.value = false;
-    mostrarPergunta.value = false;
-    mostrarPerguntaPrata.value = false;
-    mostrarPerguntaDourada.value = false;
-    respostaDigitada.value = "";
-    tempoRestAnte.value = 10;
-    playerX.value = 50;
-    jumpY.value = 0;
-    gameOver.value = false;
-    telaAtual.value = "menu";
-    setTimeout(() => {
-        telaAtual.value = "jogo";
-    }, 50);
+  vidas.splice(0, vidas.length, true, true, true);
+  mostrarMoeda.value = false;
+  mostrarMoedaPrata.value = false;
+  mostrarMoedaDourada.value = false;
+  mostrarPergunta.value = false;
+  mostrarPerguntaPrata.value = false;
+  mostrarPerguntaDourada.value = false;
+  respostaDigitada.value = "";
+  tempoRestAnte.value = 10;
+  playerX.value = 50;
+  jumpY.value = 0;
+  gameOver.value = false;
+  faseAtual.value = 1; // volta para a fase 1
+  telaAtual.value = "menu";
+  setTimeout(() => {
+    telaAtual.value = "jogo";
+  }, 50);
 }
 
 // ──────────────────────────────────────────────────────────────
-// Limpa tudo ao sair
+// Limpar estados ao desmontar / mudar fase
 // ──────────────────────────────────────────────────────────────
 function limparJogo() {
-    window.removeEventListener("keydown", onKeyDown);
-    window.removeEventListener("keyup", onKeyUp);
-    if (frameLoop) cancelAnimationFrame(frameLoop);
-    if (bossAnim) clearInterval(bossAnim);
-    if (poderLoop) clearInterval(poderLoop);
-    poderAnims.forEach((id) => clearInterval(id));
-    poderAnims.length = 0;
-    if (somNivel1.value) somNivel1.value.pause();
-
-    [somImpacto, somAgachando, somRelogio, somPulo, somMoeda, somAcerto, somPerda].forEach((som) => {
-        if (som.value) {
-            som.value.pause();
-            som.value.currentTime = 0;
-        }
-    });
-
-    if (tiroAnimFrame) {
-        cancelAnimationFrame(tiroAnimFrame);
-        tiroVisivel.value = false;
-    }
+  window.removeEventListener("keydown", onKeyDown);
+  window.removeEventListener("keyup", onKeyUp);
+  if (frameLoop) cancelAnimationFrame(frameLoop);
+  if (timerPergunta) clearInterval(timerPergunta);
+  if (moedaAnimacao) clearInterval(moedaAnimacao);
+  if (animacaoPrata) clearInterval(animacaoPrata);
+  if (animacaoDourada) clearInterval(animacaoDourada);
+  if (somNivel1.value) somNivel1.value.pause();
+  if (tiroAnimFrame) cancelAnimationFrame(tiroAnimFrame);
 }
 
 // ──────────────────────────────────────────────────────────────
-// Liga/desliga som
+// Liga/Desliga Som
 // ──────────────────────────────────────────────────────────────
 function toggleSom() {
-    if (!somNivel1.value) return;
-    somAtivo.value = !somAtivo.value;
-    if (somAtivo.value) somNivel1.value.play().catch(() => { });
-    else somNivel1.value.pause();
+  if (!somNivel1.value) return;
+  somAtivo.value = !somAtivo.value;
+  if (somAtivo.value) somNivel1.value.play().catch(() => {});
+  else somNivel1.value.pause();
 }
 
 // ──────────────────────────────────────────────────────────────
-// Liga/desliga pause
+// Liga/Desliga Pause
 // ──────────────────────────────────────────────────────────────
 function togglePause() {
-    jogoPausado.value = !jogoPausado.value;
-    if (jogoPausado.value) {
-        if (somNivel1.value) somNivel1.value.pause();
-        if (timerPergunta) clearInterval(timerPergunta);
-    } else {
-        if (somAtivo.value && somNivel1.value) somNivel1.value.play().catch(() => { });
-        if (!perguntaPausandoJogo.value) frameLoop = requestAnimationFrame(gameLoop);
-    }
+  jogoPausado.value = !jogoPausado.value;
+  if (jogoPausado.value) {
+    if (somNivel1.value) somNivel1.value.pause();
+    if (timerPergunta) clearInterval(timerPergunta);
+  } else {
+    if (somAtivo.value && somNivel1.value) somNivel1.value.play().catch(() => {});
+    if (!perguntaPausandoJogo.value) frameLoop = requestAnimationFrame(gameLoop);
+  }
 }
 
 // ──────────────────────────────────────────────────────────────
-// Watcher para trocar de tela
+// Controla troca de tela e listener de teclado
 // ──────────────────────────────────────────────────────────────
 watch(telaAtual, (t) => {
-    if (t === "jogo") iniciarJogo();
-    else limparJogo();
+  if (t === "jogo") {
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    iniciarJogo();
+  } else {
+    window.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("keyup", onKeyUp);
+    limparJogo();
+  }
 });
 
 onBeforeUnmount(() => limparJogo());
 
 onMounted(() => {
-    const tentarTocarSom = () => {
-        if (telaAtual.value === "jogo" && somNivel1.value && somAtivo.value) {
-            somNivel1.value.play().catch(() => { });
-        }
-        window.removeEventListener("click", tentarTocarSom);
-    };
-    window.addEventListener("click", tentarTocarSom);
+  const tentarTocarSom = () => {
+    if (telaAtual.value === "jogo" && somNivel1.value && somAtivo.value) {
+      somNivel1.value.play().catch(() => {});
+    }
+    window.removeEventListener("click", tentarTocarSom);
+  };
+  window.addEventListener("click", tentarTocarSom);
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 });
+
+// Quando o Player.vue emite estado de “grounded” e “agachado”:
+function onPlayerEstado(payload) {
+  groundedGlob.value = payload.grounded;
+  estaAgachado.value = payload.agachado;
+}
 </script>
 
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
 
 .cenario {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-    image-rendering: pixelated;
-    overflow: hidden;
-}
-
-.player-wrapper {
-    position: absolute;
-    bottom: 0;
-    z-index: 2;
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  image-rendering: pixelated;
+  overflow: hidden;
 }
 
 .sombra {
-    width: 150px;
-    height: auto;
-    image-rendering: pixelated;
-    pointer-events: none;
-    opacity: 0.4;
-    filter: brightness(0.2);
-    z-index: 1;
+  width: 150px;
+  height: auto;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.4;
+  filter: brightness(0.2);
+  z-index: 1;
 }
 
 .sombra-player {
-    position: absolute;
-    bottom: -4px;
-    left: 84px;
-    z-index: 1;
+  position: absolute;
+  bottom: -4px;
+  left: 84px;
+  z-index: 1;
 }
 
 .sombra-boss {
-    position: absolute;
-    bottom: -134px;
-    /* ajuste conforme necessário */
-    right: 70px;
-    /* ajuste conforme necessário */
-    width: 320px;
-    /* ajuste conforme necessário */
-    height: auto;
-    image-rendering: pixelated;
-    pointer-events: none;
-    opacity: 0.2;
-    filter: brightness(0.2);
-    z-index: 1;
+  position: absolute;
+  bottom: -134px;
+  right: 70px;
+  width: 320px;
+  height: auto;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0.2;
+  filter: brightness(0.2);
+  z-index: 1;
 }
 
 .poder {
-    position: absolute;
-    bottom: 160px;
-    width: 80px;
-    transition: right 0.05s;
-    z-index: 2;
+  position: absolute;
+  bottom: 160px;
+  height: 80px; /* ajuste conforme tamanho do sprite do poder */
+  transition: right 0.05s;
+  z-index: 2;
+  image-rendering: pixelated;
 }
 
 .btn-som {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 20;
-    padding: 3em;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+  padding: 3em;
 }
 
 .btn-som img {
-    width: 60px;
-    height: 60px;
+  width: 60px;
+  height: 60px;
 }
 
 .game-over-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
 
 .game-over-container {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 }
 
 .img-game-over {
-    width: 100%;
-    max-width: 700px;
-    image-rendering: pixelated;
-    pointer-events: none;
+  width: 100%;
+  max-width: 700px;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
 .btn-reiniciar {
-    position: absolute;
-    bottom: 38.8%;
-    font-family: "Press Start 2P", monospace;
-    font-size: 16px;
-    background: red;
-    color: #fff;
-    padding: 16px 32px;
-    border: 4px solid black;
-    box-shadow: 4px 4px black;
-    cursor: pointer;
-    transition: transform 0.1s;
-    z-index: 1000;
+  position: absolute;
+  bottom: 38.8%;
+  font-family: "Press Start 2P", monospace;
+  font-size: 16px;
+  background: red;
+  color: #fff;
+  padding: 16px 32px;
+  border: 4px solid black;
+  box-shadow: 4px 4px black;
+  cursor: pointer;
+  transition: transform 0.1s;
+  z-index: 1000;
 }
 
 .btn-reiniciar:hover {
-    transform: scale(1.05);
-    background: rgb(100, 0, 0);
-}
-
-.btn-pause {
-    position: absolute;
-    top: 10px;
-    right: 100px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    z-index: 20;
-}
-
-.btn-pause img {
-    width: 52px;
-    height: 52px;
+  transform: scale(1.05);
+  background: rgb(100, 0, 0);
 }
 
 .pause-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.9);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 9998;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9998;
 }
 
 .img-pause {
-    max-width: 700px;
-    image-rendering: pixelated;
-    pointer-events: none;
+  max-width: 700px;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
 .btn-continuar {
-    margin-top: 100px;
-    /* Aumente esse valor se ainda estiver muito acima */
-    font-family: "Press Start 2P", monospace;
-    font-size: 16px;
-    background: limegreen;
-    color: white;
-    padding: 16px 32px;
-    border: 4px solid black;
-    box-shadow: 4px 4px black;
-    cursor: pointer;
-    transition: transform 0.1s;
-    z-index: 1000;
+  margin-top: 100px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 16px;
+  background: limegreen;
+  color: white;
+  padding: 16px 32px;
+  border: 4px solid black;
+  box-shadow: 4px 4px black;
+  cursor: pointer;
+  transition: transform 0.1s;
+  z-index: 1000;
 }
 
 .btn-continuar:hover {
-    transform: scale(1.05);
-    background: green;
+  transform: scale(1.05);
+  background: green;
 }
 
 .moeda-girando {
-    position: absolute;
-    top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 180px;
-    height: auto;
-    image-rendering: pixelated;
-    z-index: 10;
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  height: auto;
+  image-rendering: pixelated;
+  z-index: 10;
 }
 
 .moeda-girando-dourada {
-    width: 190px;
-    height: auto;
-    position: absolute;
-    left: 30%;
-    bottom: 600px;
-    z-index: 10;
+  width: 190px;
+  height: auto;
+  position: absolute;
+  left: 30%;
+  bottom: 600px;
+  z-index: 10;
 }
 
 .pergunta-overlay {
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 9998;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9998;
 }
 
 .img-pergunta {
-    width: 500px;
-    image-rendering: pixelated;
-    pointer-events: none;
+  width: 500px;
+  image-rendering: pixelated;
+  pointer-events: none;
 }
 
 .contador {
-    font-family: "Press Start 2P", monospace;
-    font-size: 28px;
-    color: #00ff88;
-    margin-top: 30px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 28px;
+  color: #00ff88;
+  margin-top: 30px;
 }
 
 .intro-hq {
-    position: fixed;
-    inset: 0;
-    background-color: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 9999;
+  position: fixed;
+  inset: 0;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 9999;
 }
 
 .hq-img {
-    max-width: 100%;
-    max-height: 100vh;
-    image-rendering: pixelated;
+  max-width: 100%;
+  max-height: 100vh;
+  image-rendering: pixelated;
 }
 
 .btn-skip {
-    margin-top: 20px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 14px;
-    padding: 12px 24px;
-    background: red;
-    color: white;
-    border: 4px solid black;
-    box-shadow: 4px 4px black;
-    cursor: pointer;
+  margin-top: 20px;
+  font-family: "Press Start 2P", monospace;
+  font-size: 14px;
+  padding: 12px 24px;
+  background: red;
+  color: white;
+  border: 4px solid black;
+  box-shadow: 4px 4px black;
+  cursor: pointer;
 }
 
 /* Estilos para o tiro de laser */
 .tiro {
-    position: absolute;
-    width: 180px;
-    /* ajuste para deixar o tiro maior */
-    height: auto;
-    image-rendering: pixelated;
-    z-index: 2;
-    pointer-events: none;
+  position: absolute;
+  width: 180px;
+  height: auto;
+  image-rendering: pixelated;
+  z-index: 2;
+  pointer-events: none;
 }
 
-/* Contêiner da barra (fundo escuro) */
+/* Barra de vida do boss */
 .barra-vida {
-    position: absolute;
-    top: 10px;
-    /* ajuste a posição vertical conforme seu layout */
-    right: 10px;
-    /* ou esquerdo, dependendo de onde quiser exibir */
-    width: 200px;
-    /* largura total da barra */
-    height: 20px;
-    /* altura da barra */
-    background-color: #444;
-    /* cor de fundo “vazia” */
-    border: 2px solid #222;
-    /* borda - opcional */
-    border-radius: 4px;
-    /* cantos arredondados - opcional */
-    overflow: hidden;
-    z-index: 10;
-    /* garantir que fique acima do fundo e abaixo do boss */
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 200px;
+  height: 20px;
+  background-color: #444;
+  border: 2px solid #222;
+  border-radius: 4px;
+  overflow: hidden;
+  z-index: 10;
 }
 
-/* Parte “cheia” da barra (cor que diminui) */
 .barra-vida-fill {
-    height: 100%;
-    /* ocupa toda a altura de .barra-vida */
-    background-color: #e74c3c;
-    /* cor vermelha para vida restante */
-    transition: width 0.2s ease;
-    /* animação suave quando a vida muda */
+  height: 100%;
+  background-color: #e74c3c;
+  transition: width 0.2s ease;
 }
 </style>
+
