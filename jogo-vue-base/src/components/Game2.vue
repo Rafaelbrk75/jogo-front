@@ -22,9 +22,9 @@ const bossVidaInicial = 4;
 
 // As perguntas e moedas são definidas diretamente no componente Game2
 const perguntas = {
-  bronze: { resposta: "5", imagem: "/fase2/imgPerguntaBronze.png" },
-  prata: { resposta: "6", imagem: "/fase2/perguntaPrata.png" },
-  dourada: { resposta: "y", imagem: "/fase2/perguntaDourada.png" },
+  bronze: { resposta: "p", imagem: "/fase2/imgPerguntaBronze.png" },
+  prata: { resposta: "4", imagem: "/fase2/imgPerguntaPrata.png" },
+  dourada: { resposta: "2", imagem: "/fase2/imgPerguntaDourada.png" },
 };
 
 // As moedas são definidas diretamente no componente Game2
@@ -33,16 +33,19 @@ const moedas = {
     "/fase2/moedaBronze1.png",
     "/fase2/moedaBronze2.png",
     "/fase2/moedaBronze3.png",
+    "/fase2/moedaBronze4.png",
   ],
   prata: [
     "/fase2/moedaPrata1.png",
     "/fase2/moedaPrata2.png",
     "/fase2/moedaPrata3.png",
+    "/fase2/moedaPrata4.png",
   ],
   dourada: [
     "/fase2/moedaDourada1.png",
     "/fase2/moedaDourada2.png",
     "/fase2/moedaDourada3.png",
+    "/fase2/moedaDourada4.png",
   ],
 };
 </script>
