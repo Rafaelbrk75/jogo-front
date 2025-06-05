@@ -40,7 +40,7 @@
       <img
         src="/sombra.png"
         class="sombra sombra-player"
-        :style="{ left: playerX + 80 + 'px', bottom: '-50px' }"
+        :style="{ left: playerX + 45 + 'px', bottom: '-50px' }"
       />
 
       <!-- Moedas -->
@@ -182,7 +182,7 @@ const props = defineProps({
   bossVidaInicial: { type: Number, default: 3 },
   bossComponent: { type: Object, required: true },
   perguntas: { type: Object, required: true }, // NOVO
-  moedas: { type: Object, required: true },    // NOVO
+  moedas: { type: Object, required: true }, // NOVO
 });
 
 // ──────────────────────────────────────────────────────────────
@@ -193,6 +193,9 @@ let introTimeoutId = null;
 
 const vidas = reactive([true, true, true]);
 const playerX = ref(50);
+function atualizarX(novoX) {
+  playerX.value = novoX;
+}
 const jumpY = ref(0);
 const direcao = ref("direita");
 
@@ -343,7 +346,7 @@ function startBossPower({ sprite, speed }) {
   poderes.push({
     sprite,
     x: bossX.value, // posição horizontal do boss
-    y: 100,         // altura fixa igual ao CSS: bottom: 160px;
+    y: 100, // altura fixa igual ao CSS: bottom: 160px;
     speed,
   });
 }
@@ -361,34 +364,33 @@ function onKeyDown(e) {
 
   // Responder pergunta bronze
   if (mostrarPergunta.value && /^[a-zA-Z]$/.test(e.key)) {
-  const tecla = e.key.toUpperCase();
-  if (tecla === perguntaBronze.value.resposta.toUpperCase()) {
-    encerrarPergunta(true);
-  } else {
-    encerrarPergunta(false);
+    const tecla = e.key.toUpperCase();
+    if (tecla === perguntaBronze.value.resposta.toUpperCase()) {
+      encerrarPergunta(true);
+    } else {
+      encerrarPergunta(false);
+    }
   }
-}
 
   // Responder pergunta prata
   if (mostrarPerguntaPrata.value && /^[a-zA-Z0-9]$/.test(e.key)) {
-  const tecla = e.key.toString().toUpperCase();
-  if (tecla === perguntaPrata.value.resposta.toString().toUpperCase()) {
-    encerrarPerguntaPrata(true);
-  } else {
-    encerrarPerguntaPrata(false);
+    const tecla = e.key.toString().toUpperCase();
+    if (tecla === perguntaPrata.value.resposta.toString().toUpperCase()) {
+      encerrarPerguntaPrata(true);
+    } else {
+      encerrarPerguntaPrata(false);
+    }
   }
-}
 
   // Responder pergunta dourada
   if (mostrarPerguntaDourada.value && /^[a-zA-Z0-9]$/.test(e.key)) {
-  const tecla = e.key.toString().toUpperCase();
-  if (tecla === perguntaDourada.value.resposta.toString().toUpperCase()) {
-    encerrarPerguntaDourada(true);
-  } else {
-    encerrarPerguntaDourada(false);
+    const tecla = e.key.toString().toUpperCase();
+    if (tecla === perguntaDourada.value.resposta.toString().toUpperCase()) {
+      encerrarPerguntaDourada(true);
+    } else {
+      encerrarPerguntaDourada(false);
+    }
   }
-}
-
 
   // Pular HQ no menu
   if (e.key === "Enter" && telaAtual.value === "menu") {
@@ -459,8 +461,7 @@ function dispararTiro() {
 // Loop principal do jogo (colisões com moedas e trigger de perguntas)
 // ──────────────────────────────────────────────────────────────
 function gameLoop() {
-  if (jogoPausado.value || perguntaPausandoJogo.value || gameOver.value)
-    return;
+  if (jogoPausado.value || perguntaPausandoJogo.value || gameOver.value) return;
 
   // Colisão com moeda bronze
   const checarColisaoMoeda = (selector, onCollect) => {
@@ -783,8 +784,10 @@ function togglePause() {
     if (somNivel1.value) somNivel1.value.pause();
     if (timerPergunta) clearInterval(timerPergunta);
   } else {
-    if (somAtivo.value && somNivel1.value) somNivel1.value.play().catch(() => {});
-    if (!perguntaPausandoJogo.value) frameLoop = requestAnimationFrame(gameLoop);
+    if (somAtivo.value && somNivel1.value)
+      somNivel1.value.play().catch(() => {});
+    if (!perguntaPausandoJogo.value)
+      frameLoop = requestAnimationFrame(gameLoop);
   }
 }
 
@@ -846,13 +849,14 @@ function onPlayerEstado(payload) {
   opacity: 0.4;
   filter: brightness(0.2);
   z-index: 1;
+  bottom: -50px;
 }
 
 .sombra-player {
   position: absolute;
-  bottom: -4px;
-  left: 84px;
+  bottom: -60px;
   z-index: 1;
+  transition: left 0.1s;
 }
 
 .sombra-boss {
@@ -1078,4 +1082,3 @@ function onPlayerEstado(payload) {
   transition: width 0.2s ease;
 }
 </style>
-

@@ -29,6 +29,10 @@ const grounded = ref(true);
 const agachado = ref(false);
 const direcao = ref("direita");
 const moving = { left: false, right: false, down: false };
+const playerX = ref(50);
+function atualizarX(novoX) {
+  playerX.value = novoX;
+}
 
 // SPRITES ESTÁTICOS POR DIREÇÃO
 const sprites = {
@@ -62,6 +66,7 @@ function gameLoop() {
     rafId = requestAnimationFrame(gameLoop);
     return;
   }
+  emit("update:x", x.value);
 
   if (moving.left) x.value = Math.max(0, x.value - speed);
   if (moving.right) x.value = Math.min(window.innerWidth - 100, x.value + speed);
@@ -76,7 +81,9 @@ function gameLoop() {
     }
   }
 
-  if (agachado.value && grounded.value) y.value = 0;
+  if (grounded.value) {
+  y.value = agachado.value ? -50 : 0;
+}
 
   emit("update:x", x.value);
   emit("update:y", y.value);

@@ -27,7 +27,7 @@ const perguntas = {
   dourada: { resposta: "2", imagem: "/fase2/imgPerguntaDourada.png" },
 };
 
-// As moedas são definidas diretamente no componente Game2
+// As moedas são definidas diretamente no componente Game2 ex
 const moedas = {
   bronze: [
     "/fase2/moedaBronze1.png",
