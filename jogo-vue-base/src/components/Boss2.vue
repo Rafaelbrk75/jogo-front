@@ -2,8 +2,8 @@
   <BossBase
     ref="bossBaseRef"
     :initialX="bossX"
-    src1="/fase2/boss.png"
-    src2="/fase2/boss2.png"
+    :src1="spriteAtual"
+    :src2="spriteAlternado"
     attackSrc="/fase2/bossatk.png"
     @update:x="onUpdateX"
   />
@@ -25,6 +25,11 @@ let bossPodeAndar = false;
 const limiteEsquerdo = 100;
 const limiteDireito = window.innerWidth - 400;
 
+// Sprites que mudam conforme a direção
+const spriteAtual = ref("/fase2/bossVoltando.png");
+const spriteAlternado = ref("/fase2/bossVoltandoGrau.png");
+
+// Som da moto
 const roncoMoto = new Audio("/fase2/roncoMoto.mp3");
 roncoMoto.volume = 1.0;
 roncoMoto.loop = true;
@@ -50,9 +55,17 @@ onMounted(() => {
 
     bossX.value += direcaoBoss * 25;
 
-    if (bossX.value <= limiteEsquerdo || bossX.value >= limiteDireito) {
-      direcaoBoss *= -1;
-    }
+    if (bossX.value <= limiteEsquerdo) {
+  // Vai mudar pra direita
+  direcaoBoss = 1;
+  spriteAtual.value = "/fase2/bossVoltandoGrau.png";
+  spriteAlternado.value = "/fase2/bossVoltando.png";
+} else if (bossX.value >= limiteDireito) {
+  // Vai mudar pra esquerda
+  direcaoBoss = -1;
+  spriteAtual.value = "/fase2/boss.png";
+  spriteAlternado.value = "/fase2/boss2.png";
+}
 
     emit("update:x", bossX.value);
   }, 30);
@@ -63,4 +76,3 @@ onBeforeUnmount(() => {
   clearInterval(intervaloBoss);
 });
 </script>
-
