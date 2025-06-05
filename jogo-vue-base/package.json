@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node_modules/.bin/vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -18,6 +18,8 @@
   "devDependencies": {
     "vite": "^6.3.5",
     "vitepress": "^1.6.3"
-  }
+  },
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist"
 }
 
