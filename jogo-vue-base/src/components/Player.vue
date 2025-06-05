@@ -21,7 +21,7 @@ const props = defineProps({
 const x = ref(props.initialX);
 const y = ref(props.initialY);
 const speed = 6;
-const jumpForce = 35;
+const jumpForce = 40;
 const gravity = 0.8;
 let velocityY = 0;
 
@@ -33,7 +33,7 @@ const moving = { left: false, right: false, down: false };
 // SPRITES ESTÁTICOS POR DIREÇÃO
 const sprites = {
   direita: "/player.png",
-  esquerda: "/bonecoVoltando.jpg",
+  esquerda: "/bonecoVoltando.png",
   pulandoDireita: "/playerGiro.png",
   pulandoEsquerda: "/jumpVoltando.jpg",
   agachadoDireita: "/agachado.png",
