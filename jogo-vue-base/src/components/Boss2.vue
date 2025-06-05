@@ -11,72 +11,42 @@
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
+import { onMounted, onBeforeUnmount, ref } from "vue";
 import BossBase from "./BossBase.vue";
 
-const bossX = ref(null);
-const bossBaseRef = ref(null);
+const emit = defineEmits(["update:x"]);
 
-const emit = defineEmits(["fire-power", "update:x"]);
+const bossBaseRef = ref(null);
+const bossX = ref(0); // em pixels agora
+
+let direcaoBoss = -1;
+let intervaloBoss = null;
+
+// Define limites da pista em pixels
+const limiteEsquerdo = 100;
+const limiteDireito = window.innerWidth - 400;
+
+// Movimenta o boss automaticamente pela tela (ida e volta)
+const moverBoss = () => {
+  bossX.value += direcaoBoss * 4; // velocidade
+
+  if (bossX.value <= limiteEsquerdo || bossX.value >= limiteDireito) {
+    direcaoBoss *= -1;
+  }
+
+  emit("update:x", bossX.value);
+};
 
 function onUpdateX(novaX) {
   emit("update:x", novaX);
 }
 
-// Função para atualizar a posição do boss
-function updateBossPosition() {
-  // Aguarda a imagem carregar
-  const img = bossBaseRef.value?.bossImg?.value;
-  if (img && img.complete) {
-    bossX.value = window.innerWidth - img.offsetWidth - 50;
-  }
-}
-
-// Garante que o cálculo só ocorra após a imagem carregar
-function onImgLoad() {
-  updateBossPosition();
-}
-
-let fireInterval = null;
-
-function startFiring() {
-  fireInterval = setInterval(() => {
-    // 1) Dispara a animação de ataque (troca de sprite)
-    bossBaseRef.value?.triggerAttack();
-
-    // 2) Emite o tiro para o pai gerar a “energiabola” na tela
-    emit("fire-power", {
-      sprite: "/fase1/poder-binario.png",
-      speed: 7,
-    });
-  }, 2000);
-}
-
-onMounted(async () => {
-  await nextTick();
-  const img = bossBaseRef.value?.bossImg?.value;
-  if (img) {
-    if (img.complete) {
-      updateBossPosition();
-    } else {
-      img.addEventListener("load", onImgLoad);
-    }
-  }
-  window.addEventListener("resize", updateBossPosition);
-
-  // Chame o startFiring para ativar o ataque + animação
-  startFiring();
+onMounted(() => {
+  bossX.value = limiteDireito; // começa da direita
+  intervaloBoss = setInterval(moverBoss, 16); // ~60fps
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener("resize", updateBossPosition);
-  const img = bossBaseRef.value?.bossImg?.value;
-  if (img) {
-    img.removeEventListener("load", onImgLoad);
-  }
-  if (fireInterval) {
-    clearInterval(fireInterval);
-    fireInterval = null;
-  }
+  clearInterval(intervaloBoss);
 });
 </script>
