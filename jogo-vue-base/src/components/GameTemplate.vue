@@ -212,7 +212,7 @@ const componenteBoss = computed(() => {
 });
 
 // posição X do boss (recebida dos eventos @update:x)
-const bossX = ref(1000);
+const bossX = ref(null);
 
 // Tudo relativo ao “poder” do boss
 const poderX = ref(0);

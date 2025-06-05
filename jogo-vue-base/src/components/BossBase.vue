@@ -1,5 +1,6 @@
 <template>
   <img
+    ref="bossImg"
     :src="currentSprite"
     alt="Chefão"
     class="boss"
@@ -8,7 +9,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 
 // Props comuns a todos os bosses (posição X inicial e dois sprites para animação)
 const props = defineProps({
@@ -31,6 +32,7 @@ const emit = defineEmits(["update:x"]);
 // posição fixa em X (não se move)
 const bossX = ref(props.initialX);
 const currentSprite = ref(props.src1);
+const bossImg = ref(null);
 
 let spriteInterval = null;
 
@@ -50,13 +52,19 @@ onBeforeUnmount(() => {
     spriteInterval = null;
   }
 });
+
+defineExpose({
+  bossImg
+});
 </script>
 
 <style scoped>
 .boss {
   position: absolute;
-  bottom: 0px; /* ajuste conforme necessário para alinhar ao chão */
-  width: 350px; /* ajuste conforme desejar */
+  bottom: 0px;
+  width: 18vw; /* 18% da largura da tela, ajuste conforme necessário */
+  min-width: 350px; /* nunca menor que 350px */
+  max-width: 600px; /* limite máximo para telas muito grandes */
   transition: left 0.2s;
   z-index: 2;
   image-rendering: pixelated;
