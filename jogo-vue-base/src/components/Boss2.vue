@@ -1,12 +1,12 @@
 <template>
   <BossBase
-    ref="bossBaseRef"
-    :initialX="bossX"
-    :src1="spriteAtual"
-    :src2="spriteAlternado"
-    attackSrc="/fase2/bossatk.png"
-    @update:x="onUpdateX"
-  />
+  ref="bossBaseRef"
+  :x="bossX"
+  :src1="spriteAtual"
+  :src2="spriteAlternado"
+  attackSrc="/fase2/bossatk.png"
+  @update:x="onUpdateX"
+/>
 </template>
 
 <script setup>
@@ -74,5 +74,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
   document.removeEventListener("keydown", liberarAudio);
   clearInterval(intervaloBoss);
+  roncoMoto.pause();
+  roncoMoto.currentTime = 0;
 });
 </script>

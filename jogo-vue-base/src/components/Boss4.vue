@@ -3,11 +3,11 @@
   <BossBase
     ref="bossBaseRef"
     :initialX="bossX"
-    src1="/fase4/boss.png"
+    src1="/fase4/boss.png" s
     src2="/fase4/boss2.png"
     attackSrc="/fase4/bossatk.png"
-    :bottomOffset="200"
     @update:x="onUpdateX"
+     class="boss4"
   />
 </template>
 
@@ -81,3 +81,10 @@ onBeforeUnmount(() => {
   }
 });
 </script>
+
+<style scoped>
+.boss.boss4 {
+  bottom: 300px !important;
+  position: absolute !important;
+}
+</style>
