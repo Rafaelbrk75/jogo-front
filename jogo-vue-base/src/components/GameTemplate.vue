@@ -307,7 +307,7 @@ function iniciarJogo() {
   vidas.splice(0, vidas.length, true, true, true);
   playerX.value = 50;
   jumpY.value = 0;
-  bossX.value = 1000;
+  bossX.value = 1475;
   poderX.value = 0;
   poderVisivel.value = false;
   moedaFrame.value = 1;
