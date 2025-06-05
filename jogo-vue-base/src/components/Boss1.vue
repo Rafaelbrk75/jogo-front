@@ -13,7 +13,7 @@
 import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
 import BossBase from "./BossBase.vue";
 
-const bossX = ref(0);
+const bossX = ref(null);
 const bossBaseRef = ref(null);
 
 const emit = defineEmits(["fire-power", "update:x"]);
@@ -27,7 +27,7 @@ function updateBossPosition() {
   // Aguarda a imagem carregar
   const img = bossBaseRef.value?.bossImg?.value;
   if (img && img.complete) {
-    bossX.value = window.innerWidth - img.offsetWidth - 20;
+    bossX.value = window.innerWidth - img.offsetWidth - 50;
   }
 }
 
