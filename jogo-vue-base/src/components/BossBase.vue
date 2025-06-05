@@ -4,7 +4,7 @@
     :src="currentSprite"
     alt="Chefão"
     class="boss"
-    :style="{ left: bossX + 'px' }"
+    :style="{ left: initialX + 'px' }"
   />
 </template>
 
