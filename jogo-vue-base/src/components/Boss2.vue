@@ -1,5 +1,4 @@
 <template>
-  <!-- Usa BossBase apenas para trocar o sprite -->
   <BossBase
     ref="bossBaseRef"
     :initialX="bossX"
@@ -17,36 +16,51 @@ import BossBase from "./BossBase.vue";
 const emit = defineEmits(["update:x"]);
 
 const bossBaseRef = ref(null);
-const bossX = ref(0); // em pixels agora
+const bossX = ref(0);
 
 let direcaoBoss = -1;
 let intervaloBoss = null;
+let bossPodeAndar = false;
 
-// Define limites da pista em pixels
 const limiteEsquerdo = 100;
 const limiteDireito = window.innerWidth - 400;
 
-// Movimenta o boss automaticamente pela tela (ida e volta)
-const moverBoss = () => {
-  bossX.value += direcaoBoss * 4; // velocidade
+const roncoMoto = new Audio("/fase2/roncoMoto.mp3");
+roncoMoto.volume = 1.0;
+roncoMoto.loop = true;
+let somTocou = false;
 
-  if (bossX.value <= limiteEsquerdo || bossX.value >= limiteDireito) {
-    direcaoBoss *= -1;
+const liberarAudio = () => {
+  if (!somTocou) {
+    roncoMoto.play();
+    somTocou = true;
   }
-
-  emit("update:x", bossX.value);
 };
 
-function onUpdateX(novaX) {
-  emit("update:x", novaX);
-}
+const onUpdateX = (x) => {
+  bossX.value = x;
+};
 
 onMounted(() => {
-  bossX.value = limiteDireito; // começa da direita
-  intervaloBoss = setInterval(moverBoss, 16); // ~60fps
+  document.addEventListener("keydown", liberarAudio);
+  bossPodeAndar = true;
+
+  intervaloBoss = setInterval(() => {
+    if (!bossPodeAndar) return;
+
+    bossX.value += direcaoBoss * 25;
+
+    if (bossX.value <= limiteEsquerdo || bossX.value >= limiteDireito) {
+      direcaoBoss *= -1;
+    }
+
+    emit("update:x", bossX.value);
+  }, 30);
 });
 
 onBeforeUnmount(() => {
+  document.removeEventListener("keydown", liberarAudio);
   clearInterval(intervaloBoss);
 });
 </script>
+
