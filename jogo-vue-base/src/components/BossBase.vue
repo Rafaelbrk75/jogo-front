@@ -4,7 +4,7 @@
     :src="currentSprite"
     alt="Chefão"
     class="boss"
-    :style="{ left: initialX + 'px' }"
+    :style="{ left: x + 'px', bottom: props.bottomOffset + 'px' }"
   />
 </template>
 
@@ -28,6 +28,10 @@ const props = defineProps({
   attackSrc: {
     type: String,
     required: true,
+  },
+  bottomOffset: {
+    type: Number,
+    default: 0, // por padrão, não sobe nada
   },
 });
 

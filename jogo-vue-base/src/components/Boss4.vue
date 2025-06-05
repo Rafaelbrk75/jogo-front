@@ -6,6 +6,7 @@
     src1="/fase4/boss.png"
     src2="/fase4/boss2.png"
     attackSrc="/fase4/bossatk.png"
+    :bottomOffset="200"
     @update:x="onUpdateX"
   />
 </template>
