@@ -18,6 +18,8 @@
   "devDependencies": {
     "vite": "^6.3.5",
     "vitepress": "^1.6.3"
-  }
+  },
+  "buildCommand": "npm install && npm run build",
+  "outputDirectory": "dist"
 }
 
