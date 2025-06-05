@@ -5,6 +5,7 @@
     :initialX="bossX"
     src1="/fase1/boss.png"
     src2="/fase1/boss2.png"
+    attackSrc="/fase1/bossatk.png"
     @update:x="onUpdateX"
   />
 </template>
@@ -38,6 +39,19 @@ function onImgLoad() {
 
 let fireInterval = null;
 
+function startFiring() {
+  fireInterval = setInterval(() => {
+    // 1) Dispara a animação de ataque (troca de sprite)
+    bossBaseRef.value?.triggerAttack();
+
+    // 2) Emite o tiro para o pai gerar a “energiabola” na tela
+    emit("fire-power", {
+      sprite: "/fase1/poder-binario.png",
+      speed: 7,
+    });
+  }, 2000);
+}
+
 onMounted(async () => {
   await nextTick();
   const img = bossBaseRef.value?.bossImg?.value;
@@ -49,12 +63,9 @@ onMounted(async () => {
     }
   }
   window.addEventListener("resize", updateBossPosition);
-  fireInterval = setInterval(() => {
-    emit("fire-power", {
-      sprite: "/fase1/poder-binario.png",
-      speed: 10,
-    });
-  }, 5000);
+
+  // Chame o startFiring para ativar o ataque + animação
+  startFiring();
 });
 
 onBeforeUnmount(() => {
