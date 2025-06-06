@@ -62,10 +62,8 @@ const currentSprite = computed(() => {
 
 let rafId = null;
 function gameLoop() {
-  if (props.pausado) {
-    rafId = requestAnimationFrame(gameLoop);
-    return;
-  }
+  if (props.pausado) return;
+  
   emit("update:x", x.value);
 
   if (moving.left) x.value = Math.max(0, x.value - speed);

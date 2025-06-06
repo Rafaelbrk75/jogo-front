@@ -305,6 +305,8 @@ function iniciarJogo() {
 
   // Resetar tudo
   vidas.splice(0, vidas.length, true, true, true);
+  poderes.splice(0, poderes.length); // limpa todos os poderes
+  poderVisivel.value = false;
   playerX.value = 50;
   jumpY.value = 0;
   bossX.value = 1475;
@@ -342,7 +344,10 @@ function iniciarJogo() {
 // Quando o BossFaseX emitir “fire-power” com { sprite, speed }
 // chamamos esta função para animar o “poder” no canvas
 // ──────────────────────────────────────────────────────────────
+
 function startBossPower({ sprite, speed }) {
+  if (gameOver.value) return; // impede disparar poder após Game Over
+
   poderes.push({
     sprite,
     x: bossX.value, // posição horizontal do boss
@@ -354,8 +359,10 @@ function startBossPower({ sprite, speed }) {
 // ──────────────────────────────────────────────────────────────
 // Tratamento de teclas para o jogo (pausar, respostas, tiro)
 // ──────────────────────────────────────────────────────────────
+
 function onKeyDown(e) {
   if (e.key === "Escape") {
+
     togglePause();
     return;
   }
@@ -363,7 +370,7 @@ function onKeyDown(e) {
   if (jogoPausado.value || gameOver.value) return;
 
   // Responder pergunta bronze
-  if (mostrarPergunta.value && /^[a-zA-Z]$/.test(e.key)) {
+  if (mostrarPergunta.value && /^[a-zA-Z-Z0-9]$/.test(e.key)) {
     const tecla = e.key.toUpperCase();
     if (tecla === perguntaBronze.value.resposta.toUpperCase()) {
       encerrarPergunta(true);
@@ -732,6 +739,8 @@ function emitirVitoria() {
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
   vidas.splice(0, vidas.length, true, true, true);
+  poderes.splice(0, poderes.length); // limpa poderes ao reiniciar
+  poderVisivel.value = false;        // garante que nenhum poder antigo apareça
   mostrarMoeda.value = false;
   mostrarMoedaPrata.value = false;
   mostrarMoedaDourada.value = false;
@@ -783,6 +792,7 @@ function togglePause() {
   if (jogoPausado.value) {
     if (somNivel1.value) somNivel1.value.pause();
     if (timerPergunta) clearInterval(timerPergunta);
+    if (frameLoop) cancelAnimationFrame(frameLoop); // Impedir o jogo ficar funcionando quando estiver pausado
   } else {
     if (somAtivo.value && somNivel1.value)
       somNivel1.value.play().catch(() => {});
