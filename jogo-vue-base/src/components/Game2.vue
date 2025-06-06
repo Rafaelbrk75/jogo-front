@@ -17,14 +17,13 @@ import Boss2 from "./Boss2.vue";
 const emit = defineEmits(["vencerNivel"]);
 
 const cenario = "/fase2/nivel2.jpg";
-const musica = "/fase2/nivel2.mp3";
 const bossVidaInicial = 4;
 
 // As perguntas e moedas são definidas diretamente no componente Game2
 const perguntas = {
   bronze: { resposta: "p", imagem: "/fase2/imgPerguntaBronze.png" },
   prata: { resposta: "4", imagem: "/fase2/imgPerguntaPrata.png" },
-  dourada: { resposta: "2", imagem: "/fase2/imgPerguntaDourada.png" },
+  dourada: { resposta: "7", imagem: "/fase2/imgPerguntaDourada.png" },
 };
 
 // As moedas são definidas diretamente no componente Game2 ex
