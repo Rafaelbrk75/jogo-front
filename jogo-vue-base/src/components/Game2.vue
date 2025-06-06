@@ -6,6 +6,7 @@
     :bossComponent="Boss2"
     :perguntas="perguntas"
     :moedas="moedas"
+    @tocarPlayer="levarDano"
     @vencerNivel="$emit('vencerNivel')"
   />
 </template>
