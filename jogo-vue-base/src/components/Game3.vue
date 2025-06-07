@@ -1,5 +1,6 @@
 <template>
   <GameTemplate
+    :exibirMenu="false"
     :cenario="cenario"
     :musica="musica"
     :bossVidaInicial="bossVidaInicial"
@@ -7,7 +8,8 @@
     :perguntas="perguntas"
     :moedas="moedas"
     @vencerNivel="$emit('vencerNivel')"
-  />
+/>
+
 </template>
 
 <script setup>

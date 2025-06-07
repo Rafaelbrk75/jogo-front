@@ -21,7 +21,7 @@ const props = defineProps({
 const x = ref(props.initialX);
 const y = ref(props.initialY);
 const speed = 6;
-const jumpForce = 40;
+const jumpForce = 35;
 const gravity = 0.8;
 let velocityY = 0;
 const somPulo = new Audio("/somPulo.mp3");
@@ -144,17 +144,20 @@ function onKeyUp(e) {
 }
 
 onMounted(() => {
+  window.focus(); // garante que o jogo esteja em foco após sair do Menu
   direcao.value = "direita";
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("keyup", onKeyUp);
   rafId = requestAnimationFrame(gameLoop);
 });
 
+
 onBeforeUnmount(() => {
   window.removeEventListener("keydown", onKeyDown);
   window.removeEventListener("keyup", onKeyUp);
   if (rafId) cancelAnimationFrame(rafId);
 });
+
 
 </script>
 

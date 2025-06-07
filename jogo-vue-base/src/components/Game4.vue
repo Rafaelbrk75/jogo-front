@@ -1,11 +1,13 @@
 <template>
   <GameTemplate
+    :exibirMenu="false"
     :cenario="cenario"
     :musica="musica"
     :bossVidaInicial="bossVidaInicial"
     :bossComponent="Boss4"
     :perguntas="perguntas"
     :moedas="moedas"
+    @fire-power="emit('fire-power', $event)" 
     @vencerNivel="$emit('vencerNivel')"
   />
 </template>

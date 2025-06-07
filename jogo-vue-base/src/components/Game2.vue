@@ -1,5 +1,6 @@
 <template>
   <GameTemplate
+    :exibirMenu="false"
     :cenario="cenario"
     :musica="musica"
     :bossVidaInicial="bossVidaInicial"
@@ -18,16 +19,23 @@ import Boss2 from "./Boss2.vue";
 const emit = defineEmits(["vencerNivel"]);
 
 const cenario = "/fase2/nivel2.jpg";
+const musica = "/fase2/nivel2.mp3"; // ✅ Adicionada
 const bossVidaInicial = 4;
 
-// As perguntas e moedas são definidas diretamente no componente Game2
+// ✅ Função levarDano fictícia (você pode alterar conforme sua lógica real)
+function levarDano() {
+  console.log("Jogador levou dano na fase 2");
+  // Aqui você pode emitir eventos, manipular vidas, etc.
+}
+
+// ✅ Perguntas
 const perguntas = {
   bronze: { resposta: "p", imagem: "/fase2/imgPerguntaBronze.png" },
   prata: { resposta: "4", imagem: "/fase2/imgPerguntaPrata.png" },
   dourada: { resposta: "7", imagem: "/fase2/imgPerguntaDourada.png" },
 };
 
-// As moedas são definidas diretamente no componente Game2 ex
+// ✅ Moedas
 const moedas = {
   bronze: [
     "/fase2/moedaBronze1.png",

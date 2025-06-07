@@ -1,7 +1,7 @@
 <template>
   <BossBase
   ref="bossBaseRef"
-   class="boss"
+  class="boss"
   :x="bossX"
   :src1="spriteAtual"
   :src2="spriteAlternado"

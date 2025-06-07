@@ -34,7 +34,7 @@
         :initialX="bossX"
         @update:x="bossX = $event"
         @fire-power="startBossPower"
-         @tocarPlayer="levarDano"
+        @tocarPlayer="levarDano"
       />
 
       <!-- Sombra do Player -->
@@ -178,18 +178,20 @@ import BossFase1 from "./Boss1.vue";
 import BossFase2 from "./Boss2.vue";
 
 const props = defineProps({
+  exibirMenu: { type: Boolean, default: false }, // ← ADICIONADO
   cenario: { type: String, required: true },
   musica: { type: String, required: true },
   bossVidaInicial: { type: Number, default: 3 },
   bossComponent: { type: Object, required: true },
-  perguntas: { type: Object, required: true }, // NOVO
-  moedas: { type: Object, required: true }, // NOVO
+  perguntas: { type: Object, required: true },
+  moedas: { type: Object, required: true },
 });
+
 
 // ──────────────────────────────────────────────────────────────
 // Estados principais do GameTemplate
 // ──────────────────────────────────────────────────────────────
-const telaAtual = ref("menu"); // "menu" | "intro" | "jogo"
+const telaAtual = ref(props.exibirMenu ? "menu" : "jogo");
 let introTimeoutId = null;
 
 const vidas = reactive([true, true, true]);
@@ -213,7 +215,7 @@ const componenteBoss = computed(() => {
 });
 
 // posição X do boss (recebida dos eventos @update:x)
-const bossX = ref(null);
+const bossX = ref(window.innerWidth - 400); // exemplo de valor inicial razoável
 
 // Tudo relativo ao “poder” do boss
 const poderX = ref(0);
@@ -261,7 +263,7 @@ const perguntaDourada = computed(() => props.perguntas.dourada);
 const tiroVisivel = ref(false);
 const tiroX = ref(0);
 const tiroY = ref(0);
-const tiroSpeed = 15;
+const tiroSpeed = 30;
 let tiroAnimFrame = null;
 
 let frameLoop = null;
@@ -346,13 +348,13 @@ function iniciarJogo() {
 // chamamos esta função para animar o “poder” no canvas
 // ──────────────────────────────────────────────────────────────
 
-function startBossPower({ sprite, speed }) {
-  if (gameOver.value) return; // impede disparar poder após Game Over
-
+function startBossPower({ sprite, speed, x, y }) {
+  console.log("Recebido fire-power:", sprite, speed, x, y);
+  if (gameOver.value) return;
   poderes.push({
     sprite,
-    x: bossX.value, // posição horizontal do boss
-    y: 100, // altura fixa igual ao CSS: bottom: 160px;
+    x: x ?? bossX.value,
+    y: y ?? 100,
     speed,
   });
 }
@@ -520,6 +522,7 @@ function gameLoop() {
 
   // Atualiza e remove poderes do boss
   for (let i = poderes.length - 1; i >= 0; i--) {
+    console.log("Poder", i, poderes[i]);
     poderes[i].x -= poderes[i].speed;
 
     const playerEl = document.querySelector(".player");
@@ -740,8 +743,8 @@ function emitirVitoria() {
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
   vidas.splice(0, vidas.length, true, true, true);
-  poderes.splice(0, poderes.length); // limpa poderes ao reiniciar
-  poderVisivel.value = false;        // garante que nenhum poder antigo apareça
+  poderes.splice(0, poderes.length);
+  poderVisivel.value = false;
   mostrarMoeda.value = false;
   mostrarMoedaPrata.value = false;
   mostrarMoedaDourada.value = false;
@@ -753,12 +756,11 @@ function reiniciarJogo() {
   playerX.value = 50;
   jumpY.value = 0;
   gameOver.value = false;
-  faseAtual.value = 1; // volta para a fase 1
-  telaAtual.value = "menu";
-  setTimeout(() => {
-    telaAtual.value = "jogo";
-  }, 50);
+
+  // Corrigido: não retornar para a tela de menu
+  telaAtual.value = "jogo";
 }
+
 
 // ──────────────────────────────────────────────────────────────
 // Limpar estados ao desmontar / mudar fase

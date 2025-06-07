@@ -1,5 +1,4 @@
 <template>
-  <!-- Usa BossBase apenas para trocar o sprite -->
   <BossBase
     ref="bossBaseRef"
     :initialX="bossX"
@@ -14,7 +13,7 @@
 import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
 import BossBase from "./BossBase.vue";
 
-const bossX = ref(null);
+const bossX = ref(window.innerWidth - 400); // valor inicial melhor que null
 const bossBaseRef = ref(null);
 
 const emit = defineEmits(["fire-power", "update:x"]);
@@ -23,16 +22,15 @@ function onUpdateX(novaX) {
   emit("update:x", novaX);
 }
 
-// Função para atualizar a posição do boss
 function updateBossPosition() {
-  // Aguarda a imagem carregar
   const img = bossBaseRef.value?.bossImg?.value;
   if (img && img.complete) {
     bossX.value = window.innerWidth - img.offsetWidth - 50;
+    emit("update:x", bossX.value); // <-- isso aqui é ESSENCIAL
   }
 }
 
-// Garante que o cálculo só ocorra após a imagem carregar
+
 function onImgLoad() {
   updateBossPosition();
 }
@@ -41,10 +39,7 @@ let fireInterval = null;
 
 function startFiring() {
   fireInterval = setInterval(() => {
-    // 1) Dispara a animação de ataque (troca de sprite)
     bossBaseRef.value?.triggerAttack();
-
-    // 2) Emite o tiro para o pai gerar a “energiabola” na tela
     emit("fire-power", {
       sprite: "/fase1/poder-binario.png",
       speed: 7,
@@ -63,20 +58,13 @@ onMounted(async () => {
     }
   }
   window.addEventListener("resize", updateBossPosition);
-
-  // Chame o startFiring para ativar o ataque + animação
   startFiring();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateBossPosition);
   const img = bossBaseRef.value?.bossImg?.value;
-  if (img) {
-    img.removeEventListener("load", onImgLoad);
-  }
-  if (fireInterval) {
-    clearInterval(fireInterval);
-    fireInterval = null;
-  }
+  if (img) img.removeEventListener("load", onImgLoad);
+  if (fireInterval) clearInterval(fireInterval);
 });
 </script>

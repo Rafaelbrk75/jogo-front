@@ -1,5 +1,6 @@
 <template>
   <GameTemplate
+    :exibirMenu="true"
     :cenario="cenario"
     :musica="musica"
     :bossVidaInicial="bossVidaInicial"
