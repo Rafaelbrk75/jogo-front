@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 
 const emit = defineEmits(["update:x", "update:y", "update:direcao", "update:estado"]);
 
@@ -155,6 +155,22 @@ onBeforeUnmount(() => {
   window.removeEventListener("keyup", onKeyUp);
   if (rafId) cancelAnimationFrame(rafId);
 });
+
+watch(
+  () => props.pausado,
+  (novo) => {
+    if (novo) {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    } else {
+      if (!rafId) {
+        rafId = requestAnimationFrame(gameLoop);
+      }
+    }
+  }
+);
 
 </script>
 
