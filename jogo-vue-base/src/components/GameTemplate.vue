@@ -34,6 +34,7 @@
         :initialX="bossX"
         @update:x="bossX = $event"
         @fire-power="startBossPower"
+         @tocarPlayer="levarDano"
       />
 
       <!-- Sombra do Player -->
@@ -834,6 +835,20 @@ onMounted(() => {
 function onPlayerEstado(payload) {
   groundedGlob.value = payload.grounded;
   estaAgachado.value = payload.agachado;
+}
+
+function levarDano() {
+  if (invulneravel.value || jogoPausado.value) return;
+
+  const idx = vidas.findIndex((v) => v);
+  if (idx !== -1) vidas[idx] = false;
+
+  verificarGameOver();
+
+  invulneravel.value = true;
+  setTimeout(() => {
+    invulneravel.value = false;
+  }, 2000);
 }
 </script>
 

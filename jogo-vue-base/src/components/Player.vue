@@ -24,6 +24,10 @@ const speed = 6;
 const jumpForce = 40;
 const gravity = 0.8;
 let velocityY = 0;
+const somPulo = new Audio("/somPulo.mp3");
+somPulo.volume = 1.0;
+const somAgachando = new Audio("/somAgachando.mp3");
+somAgachando.volume = 1.0;
 
 const grounded = ref(true);
 const agachado = ref(false);
@@ -113,12 +117,18 @@ function onKeyDown(e) {
     moving.down = true;
     agachado.value = true;
     y.value = 0;
+
+    somAgachando.currentTime = 0;
+    somAgachando.play().catch(() => {});
   }
 
   if ((e.key === " " || e.key === "w") && grounded.value && !agachado.value) {
     grounded.value = false;
     agachado.value = false;
     velocityY = jumpForce;
+
+    somPulo.currentTime = 0;
+    somPulo.play().catch(() => {});
   }
 }
 
@@ -145,6 +155,7 @@ onBeforeUnmount(() => {
   window.removeEventListener("keyup", onKeyUp);
   if (rafId) cancelAnimationFrame(rafId);
 });
+
 </script>
 
 <style scoped>

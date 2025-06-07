@@ -31,9 +31,9 @@
 import { ref, onMounted, onBeforeUnmount } from "vue";
 const emit = defineEmits(["start"]);
 
+const somEnter = ref(null);
 const somAtivo = ref(false);
 const musica = ref(null);
-const somEnter = ref(null);
 const textoTopo = ref("F11 para uma melhor experiência =)");
 
 let intervaloMensagem = null;
@@ -56,9 +56,10 @@ function handleTecla(e) {
     if (somEnter.value) {
       // Reduz o volume da música de fundo
       if (musica.value) {
-        musica.value.volume = 0.1;
+        musica.value.volume = 0.6;
       }
 
+      somEnter.value.volume = 1.0;
       somEnter.value.currentTime = 0;
       somEnter.value.play().catch(() => {});
 
@@ -189,18 +190,33 @@ onBeforeUnmount(() => {
 
 /* RGB alternando */
 @keyframes corRGB {
-  0%   { color: #ff5555; }
-  25%  { color: #55aaff; }
-  50%  { color: #55ff55; }
-  75%  { color: #ffff55; }
-  100% { color: #ff5555; }
+  0% {
+    color: #ff5555;
+  }
+  25% {
+    color: #55aaff;
+  }
+  50% {
+    color: #55ff55;
+  }
+  75% {
+    color: #ffff55;
+  }
+  100% {
+    color: #ff5555;
+  }
 }
 
 /* Fade suave piscando */
 @keyframes fadeBlink {
-  0%   { opacity: 1; }
-  50%  { opacity: 0.2; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 </style>
-
