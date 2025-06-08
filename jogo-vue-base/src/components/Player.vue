@@ -174,24 +174,6 @@ onBeforeUnmount(() => {
   if (rafId) cancelAnimationFrame(rafId);
 });
 
-watch(
-  () => props.pausado,
-  (novo) => {
-    if (novo) {
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-    } else {
-      if (!rafId) {
-        rafId = requestAnimationFrame(gameLoop);
-      }
-    }
-  }
-);
-
-
-
 </script>
 
 <style scoped>
