@@ -1,7 +1,7 @@
 <template>
   <!-- Usa BossBase apenas para trocar o sprite -->
   <BossBase
-  ref="bossBaseRef"
+    ref="bossBaseRef"
     :initialX="bossX"
     src1="/fase3/boss.png"
     src2="/fase3/boss2.png"
@@ -14,7 +14,8 @@
 import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
 import BossBase from "./BossBase.vue";
 
-const bossX = ref(null);
+const bossX = ref(window.innerWidth - 400);
+const bossY = ref(300); // Adicione esta linha para controlar a altura do boss
 const bossBaseRef = ref(null);
 
 const emit = defineEmits(["fire-power", "update:x"]);
@@ -23,16 +24,14 @@ function onUpdateX(novaX) {
   emit("update:x", novaX);
 }
 
-// Função para atualizar a posição do boss
 function updateBossPosition() {
-  // Aguarda a imagem carregar
   const img = bossBaseRef.value?.bossImg?.value;
   if (img && img.complete) {
     bossX.value = window.innerWidth - img.offsetWidth - 50;
+    emit("update:x", bossX.value);
   }
 }
 
-// Garante que o cálculo só ocorra após a imagem carregar
 function onImgLoad() {
   updateBossPosition();
 }
@@ -41,13 +40,14 @@ let fireInterval = null;
 
 function startFiring() {
   fireInterval = setInterval(() => {
-    // 1) Dispara a animação de ataque (troca de sprite)
     bossBaseRef.value?.triggerAttack();
-
-    // 2) Emite o tiro para o pai gerar a “energiabola” na tela
+    const deslocamentoX = 60;
+    const posX = bossX.value - deslocamentoX;
     emit("fire-power", {
-      sprite: "/fase1/poder-binario.png",
+      sprite: "/fase1/poder-binario.png", // Corrija para o sprite da fase 1
       speed: 7,
+      x: posX,
+      y: 90 // Agora bossY existe!
     });
   }, 2000);
 }
@@ -63,20 +63,13 @@ onMounted(async () => {
     }
   }
   window.addEventListener("resize", updateBossPosition);
-
-  // Chame o startFiring para ativar o ataque + animação
   startFiring();
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateBossPosition);
   const img = bossBaseRef.value?.bossImg?.value;
-  if (img) {
-    img.removeEventListener("load", onImgLoad);
-  }
-  if (fireInterval) {
-    clearInterval(fireInterval);
-    fireInterval = null;
-  }
+  if (img) img.removeEventListener("load", onImgLoad);
+  if (fireInterval) clearInterval(fireInterval);
 });
 </script>

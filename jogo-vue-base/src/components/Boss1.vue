@@ -40,12 +40,26 @@ let fireInterval = null;
 function startFiring() {
   fireInterval = setInterval(() => {
     bossBaseRef.value?.triggerAttack();
+
+    const deslocamentoX = 60; // Tente entre 30 e 60
+
+    const posX = bossX.value - deslocamentoX; // Subtrai para jogar o poder pra esquerda do boss
+    const posY = 90; // ou 380, 420, etc.
+
+    console.log("🔥 Criando poder em:", posX, posY);
+    // Emite o evento de disparo com os parâmetros corretos
+
     emit("fire-power", {
       sprite: "/fase1/poder-binario.png",
       speed: 7,
+      x: posX,
+      y: posY,
     });
   }, 2000);
 }
+
+
+
 
 onMounted(async () => {
   await nextTick();

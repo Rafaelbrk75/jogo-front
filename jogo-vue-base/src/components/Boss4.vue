@@ -1,14 +1,8 @@
 <template>
   <!-- Usa BossBase apenas para trocar o sprite -->
-  <BossBase
-  ref="bossBaseRef"
-  :initialX="bossX"
-  src1="/fase4/boss.png"
-  src2="/fase4/boss2.png"
-  attackSrc="/fase4/bossatk.png"
-  @update:x="onUpdateX"
-  :style="{ top: bossY + 'px', left: bossX + 'px', position: 'absolute' }"
-/>
+  <BossBase ref="bossBaseRef" :initialX="bossX" src1="/fase4/boss.png" src2="/fase4/boss2.png"
+    attackSrc="/fase4/bossatk.png" @update:x="onUpdateX"
+    :style="{ top: bossY + 'px', left: bossX + 'px', position: 'absolute' }" />
 
 </template>
 
@@ -20,6 +14,7 @@ const bossX = ref(window.innerWidth - 400); // valor inicial
 const bossBaseRef = ref(null);
 const emit = defineEmits(["fire-power", "update:x"]);
 const bossY = ref(300); // altura inicial personalizada
+
 
 
 function onUpdateX(novaX) {
@@ -45,6 +40,9 @@ let fireInterval = null;
 
 function startFiring() {
   let contador = 0;
+  if (gameOver.value) return;
+  if (fireInterval) clearInterval(fireInterval); // Limpa o intervalo anterior
+  bossBaseRef.value?.triggerAttack(); // Garante que o ataque inicial seja disparado
   fireInterval = setInterval(() => {
     bossBaseRef.value?.triggerAttack();
     console.log("🔥 Disparo Boss 4 em x =", bossX.value);
@@ -91,20 +89,22 @@ function startTeleporting() {
   somTeleporte.volume = 1.0;
 
   setInterval(() => {
-    const novaX = Math.floor(
-      Math.random() * (window.innerWidth - larguraBoss - margem)
-    ) + margem;
+    const novaX = Math.max(
+      50,
+      Math.min(window.innerWidth - larguraBoss - margem, Math.random() * window.innerWidth)
+    );
 
-    const novaY = Math.floor(
-      Math.random() * (window.innerHeight - alturaBoss - 200)
-    ) + 100;
+    const novaY = Math.max(
+      100,
+      Math.min(window.innerHeight - alturaBoss - 200, Math.random() * window.innerHeight)
+    );
 
     bossX.value = novaX;
     bossY.value = novaY;
     emit("update:x", bossX.value);
 
     somTeleporte.currentTime = 0;
-    somTeleporte.play().catch(() => {});
+    somTeleporte.play().catch(() => { });
 
     console.log("🌀 Teleportando boss para:", novaX, novaY);
   }, 3000);

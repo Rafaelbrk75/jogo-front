@@ -56,4 +56,6 @@ const moedas = {
     "/fase2/moedaDourada4.png",
   ],
 };
+
+
 </script>

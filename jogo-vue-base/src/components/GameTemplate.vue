@@ -10,11 +10,7 @@
     </div>
 
     <!-- Tela de Jogo -->
-    <div
-      v-else-if="telaAtual === 'jogo'"
-      class="cenario"
-      :style="{ backgroundImage: `url('${cenario}')` }"
-    >
+    <div v-else-if="telaAtual === 'jogo'" class="cenario" :style="{ backgroundImage: `url('${cenario}')` }">
       <Hud :vidas="vidas" />
 
       <!-- Sombra do Boss -->
@@ -22,140 +18,95 @@
 
       <!-- Barra de vida do Boss -->
       <div class="barra-vida">
-        <div
-          class="barra-vida-fill"
-          :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"
-        ></div>
+        <div class="barra-vida-fill" :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"></div>
       </div>
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
-      <component
-        :is="bossComponent"
+      <component 
+        :is="bossComponent" 
+        :key="faseAtual" 
+        class="boss"
         :initialX="bossX"
         @update:x="bossX = $event"
         @fire-power="startBossPower"
         @tocarPlayer="levarDano"
-      />
-
-      <!-- Sombra do Player -->
-      <img
-        src="/sombra.png"
-        class="sombra sombra-player"
-        :style="{ left: playerX + 45 + 'px', bottom: '-50px' }"
-      />
-
-      <!-- Moedas -->
-      <img
-        v-if="mostrarMoeda"
-        :src="moedas.bronze[moedaFrame - 1]"
-        alt="Moeda Girando"
-        class="moeda-girando"
-      />
-      <img
-        v-if="mostrarMoedaPrata"
-        :src="moedas.prata[moedaPrataFrame - 1]"
-        alt="Moeda Prata Girando"
-        class="moeda-girando"
-      />
-      <img
-        v-if="mostrarMoedaDourada"
-        :src="moedas.dourada[moedaDouradaFrame - 1]"
-        class="moeda-girando-dourada"
-      />
-
-      <!-- Perguntas -->
-      <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
-        <img :src="perguntaBronze.imagem" class="img-pergunta" />
-        <div class="contador">{{ tempoRestAnte }}</div>
-      </div>
-      <div v-if="mostrarPerguntaPrata" class="pergunta-overlay" @click.stop>
-        <img :src="perguntaPrata.imagem" class="img-pergunta" />
-        <div class="contador">{{ tempoRestAnte }}</div>
-      </div>
-      <div v-if="mostrarPerguntaDourada" class="pergunta-overlay" @click.stop>
-        <img :src="perguntaDourada.imagem" class="img-pergunta" />
-        <div class="contador">{{ tempoRestAnte }}</div>
-      </div>
-
-      <!-- Player (envia posição/estado via eventos emitidos) -->
-      <Player
-        :initialX="playerX"
-        :initialY="jumpY"
-        :pausado="jogoPausado || perguntaPausandoJogo"
-        @update:x="playerX = $event"
-        @update:y="jumpY = $event"
-        @update:direcao="direcao = $event"
-        @update:estado="onPlayerEstado($event)"
-      />
-
-      <!-- Poder (vindo do Boss) -->
-      <img
-        v-if="poderVisivel"
-        ref="poder"
-        :src="poderSprite"
-        alt="Poder"
-        class="poder"
-        :style="{ right: poderX + 'px' }"
-      />
-
-      <!-- Renderiza todos os poderes ativos do boss -->
-      <img
-        v-for="(poder, idx) in poderes"
-        :key="idx"
-        :src="poder.sprite"
-        class="poder"
-        :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }"
-      />
-
-      <!-- Tiro de Laser do Player -->
-      <img
-        v-if="tiroVisivel"
-        src="/impacto_laser_pixelado.png"
-        alt="Tiro de Laser"
-        class="tiro"
-        :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }"
-      />
-
-      <!-- Áudios -->
-      <audio ref="somNivel1" :src="musica" loop />
-      <audio ref="somImpacto" src="/somImpacto.mp3" />
-      <audio ref="somGameOver" src="/gameover.mp3" />
-      <audio ref="somAgachando" src="/somAgachando.mp3" />
-      <audio ref="somPulo" src="/somPulo.mp3" />
-      <audio ref="somMoeda" src="/public/somMoeda.wav" />
-      <audio ref="somAcerto" src="/somAcerto.wav" />
-      <audio ref="somPerda" src="/somPerda.mp3" />
-      <audio ref="somRelogio" src="/somRelogio.mp3" />
-
-      <!-- Botão de Som -->
-      <button @click.stop="toggleSom" class="btn-som">
-        <img
-          :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'"
-          alt="Som"
         />
-      </button>
 
-      <!-- Overlay de Pause -->
-      <div v-if="jogoPausado" class="pause-overlay">
-        <img src="/telaPause.png" class="img-pause" alt="Pausado" />
-        <button
-          v-if="jogoPausado"
-          class="btn-continuar"
-          @click.stop="togglePause"
-        >
-          CONTINUAR
+
+        <!-- Sombra do Player -->
+        <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 45 + 'px', bottom: '-50px' }" />
+
+        <!-- Moedas -->
+        <img v-if="mostrarMoeda" :src="moedas.bronze[moedaFrame - 1]" alt="Moeda Girando" class="moeda-girando" />
+        <img v-if="mostrarMoedaPrata" :src="moedas.prata[moedaPrataFrame - 1]" alt="Moeda Prata Girando"
+          class="moeda-girando" />
+        <img v-if="mostrarMoedaDourada" :src="moedas.dourada[moedaDouradaFrame - 1]" class="moeda-girando-dourada" />
+
+        <!-- Perguntas -->
+        <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
+          <img :src="perguntaBronze.imagem" class="img-pergunta" />
+          <div class="contador">{{ tempoRestAnte }}</div>
+        </div>
+        <div v-if="mostrarPerguntaPrata" class="pergunta-overlay" @click.stop>
+          <img :src="perguntaPrata.imagem" class="img-pergunta" />
+          <div class="contador">{{ tempoRestAnte }}</div>
+        </div>
+        <div v-if="mostrarPerguntaDourada" class="pergunta-overlay" @click.stop>
+          <img :src="perguntaDourada.imagem" class="img-pergunta" />
+          <div class="contador">{{ tempoRestAnte }}</div>
+        </div>
+
+        <!-- Player (envia posição/estado via eventos emitidos) -->
+        <Player :initialX="playerX" :initialY="jumpY" :pausado="jogoPausado || perguntaPausandoJogo"
+          @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
+          @update:estado="onPlayerEstado($event)" />
+
+        <!-- Poder (vindo do Boss) -->
+        <img v-if="poderVisivel" ref="poder" :src="poderSprite" alt="Poder" class="poder"
+          :style="{ right: poderX + 'px' }" />
+
+
+        <!-- Renderiza todos os poderes ativos do boss -->
+        <img v-for="(poder, idx) in poderes" :key="idx" :src="poder.sprite" class="poder"
+          :style="{ left: (poder.x || 0) + 'px', bottom: (typeof poder.y === 'number' ? poder.y : 0) + 'px' }" />
+
+        <!-- Tiro de Laser do Player -->
+        <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
+          :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
+
+        <!-- Áudios -->
+        <audio ref="somNivel1" :src="musica" loop />
+        <audio ref="somImpacto" src="/somImpacto.mp3" />
+        <audio ref="somGameOver" src="/gameover.mp3" />
+        <audio ref="somAgachando" src="/somAgachando.mp3" />
+        <audio ref="somPulo" src="/somPulo.mp3" />
+        <audio ref="somMoeda" src="/public/somMoeda.wav" />
+        <audio ref="somAcerto" src="/somAcerto.wav" />
+        <audio ref="somPerda" src="/somPerda.mp3" />
+        <audio ref="somRelogio" src="/somRelogio.mp3" />
+
+        <!-- Botão de Som -->
+        <button @click.stop="toggleSom" class="btn-som">
+          <img :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'" alt="Som" />
         </button>
-      </div>
 
-      <!-- Tela de Game Over -->
-      <div v-if="gameOver" class="game-over-overlay">
-        <div class="game-over-container">
-          <img src="/imgGameOver.png" class="img-game-over" alt="Game Over" />
-          <button class="btn-reiniciar" @click="reiniciarJogo">
-            REINICIAR
+        <!-- Overlay de Pause -->
+        <div v-if="jogoPausado" class="pause-overlay">
+          <img src="/telaPause.png" class="img-pause" alt="Pausado" />
+          <button v-if="jogoPausado" class="btn-continuar" @click.stop="togglePause">
+            CONTINUAR
           </button>
         </div>
-      </div>
+
+        <!-- Tela de Game Over -->
+        <div v-if="gameOver" class="game-over-overlay">
+          <div class="game-over-container">
+            <img src="/imgGameOver.png" class="img-game-over" alt="Game Over" />
+            <button class="btn-reiniciar" @click="reiniciarJogo">
+              REINICIAR
+            </button>
+          </div>
+        </div>
     </div>
   </div>
 </template>
@@ -187,6 +138,7 @@ const props = defineProps({
   moedas: { type: Object, required: true },
 });
 
+const playerKey = ref(0);
 
 // ──────────────────────────────────────────────────────────────
 // Estados principais do GameTemplate
@@ -260,6 +212,7 @@ const perguntaBronze = computed(() => props.perguntas.bronze);
 const perguntaPrata = computed(() => props.perguntas.prata);
 const perguntaDourada = computed(() => props.perguntas.dourada);
 
+
 const tiroVisivel = ref(false);
 const tiroX = ref(0);
 const tiroY = ref(0);
@@ -272,7 +225,7 @@ let animacaoPrata = null;
 let animacaoDourada = null;
 let timerPergunta = null;
 
-const poderes = reactive([]);
+const poderes = ref([]);
 
 // ──────────────────────────────────────────────────────────────
 // Exibe a HQ antes de iniciar o jogo
@@ -301,14 +254,14 @@ function iniciarJogo() {
   if (somNivel1.value) {
     somNivel1.value.currentTime = 0;
     somNivel1.value.loop = true;
-    somNivel1.value.play().catch(() => {});
+    somNivel1.value.play().catch(() => { });
   }
   somAtivo.value = true;
   gameOver.value = false;
 
   // Resetar tudo
   vidas.splice(0, vidas.length, true, true, true);
-  poderes.splice(0, poderes.length); // limpa todos os poderes
+  poderes.value.splice(0, poderes.value.length); // limpa todos os poderes
   poderVisivel.value = false;
   playerX.value = 50;
   jumpY.value = 0;
@@ -349,15 +302,20 @@ function iniciarJogo() {
 // ──────────────────────────────────────────────────────────────
 
 function startBossPower({ sprite, speed, x, y }) {
-  console.log("Recebido fire-power:", sprite, speed, x, y);
-  if (gameOver.value) return;
-  poderes.push({
+  const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
+  const poderY = typeof y === "number" ? y : 300;
+
+  console.log("🔥 Poder ajustado:", poderX, poderY);
+
+  poderes.value.push({
     sprite,
-    x: x ?? bossX.value,
-    y: y ?? 100,
-    speed,
+    x: poderX,
+    y: poderY,
+    speed
   });
 }
+
+
 
 // ──────────────────────────────────────────────────────────────
 // Tratamento de teclas para o jogo (pausar, respostas, tiro)
@@ -370,7 +328,8 @@ function onKeyDown(e) {
     return;
   }
 
-  if (jogoPausado.value || gameOver.value) return;
+  if (gameOver.value && e.key !== "Escape") return;
+
 
   // Responder pergunta bronze
   if (mostrarPergunta.value && /^[a-zA-Z-Z0-9]$/.test(e.key)) {
@@ -494,7 +453,7 @@ function gameLoop() {
       mostrarMoeda.value = false;
       if (somMoeda.value && somAtivo.value) {
         somMoeda.value.currentTime = 0;
-        somMoeda.value.play().catch(() => {});
+        somMoeda.value.play().catch(() => { });
       }
       iniciarPergunta();
     });
@@ -504,7 +463,7 @@ function gameLoop() {
       mostrarMoedaPrata.value = false;
       if (somMoeda.value && somAtivo.value) {
         somMoeda.value.currentTime = 0;
-        somMoeda.value.play().catch(() => {});
+        somMoeda.value.play().catch(() => { });
       }
       iniciarPerguntaPrata();
     });
@@ -514,16 +473,16 @@ function gameLoop() {
       mostrarMoedaDourada.value = false;
       if (somMoeda.value && somAtivo.value) {
         somMoeda.value.currentTime = 0;
-        somMoeda.value.play().catch(() => {});
+        somMoeda.value.play().catch(() => { });
       }
       iniciarPerguntaDourada();
     });
   }
 
   // Atualiza e remove poderes do boss
-  for (let i = poderes.length - 1; i >= 0; i--) {
-    console.log("Poder", i, poderes[i]);
-    poderes[i].x -= poderes[i].speed;
+  for (let i = poderes.value.length - 1; i >= 0; i--) {
+    console.log("Poder", i, poderes.value[i]);
+    poderes.value[i].x -= poderes.value[i].speed;
 
     const playerEl = document.querySelector(".player");
     const poderEls = document.querySelectorAll(".poder");
@@ -542,14 +501,14 @@ function gameLoop() {
         // Remove uma vida
         const idx = vidas.findIndex((v) => v);
         if (idx !== -1) vidas[idx] = false;
-        poderes.splice(i, 1);
+        poderes.value.splice(i, 1);
         verificarGameOver();
         continue;
       }
     }
 
-    if (poderes[i] && poderes[i].x < -200) {
-      poderes.splice(i, 1);
+    if (poderes.value[i] && poderes.value[i].x < -200) {
+      poderes.value.splice(i, 1);
     }
   }
 
@@ -566,7 +525,7 @@ function iniciarPergunta() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -587,10 +546,10 @@ function encerrarPergunta(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => {});
+      somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => {});
+      somPerda.value.play().catch(() => { });
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -620,7 +579,7 @@ function iniciarPerguntaPrata() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -641,10 +600,10 @@ function encerrarPerguntaPrata(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => {});
+      somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => {});
+      somPerda.value.play().catch(() => { });
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -674,7 +633,7 @@ function iniciarPerguntaDourada() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -695,10 +654,10 @@ function encerrarPerguntaDourada(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => {});
+      somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => {});
+      somPerda.value.play().catch(() => { });
       let perdidas = 0;
       for (let i = 0; i < vidas.length && perdidas < 3; i++) {
         if (vidas[i]) {
@@ -723,8 +682,9 @@ function verificarGameOver() {
     if (somNivel1.value) somNivel1.value.pause();
     if (somGameOver.value && somAtivo.value) {
       somGameOver.value.currentTime = 0;
-      somGameOver.value.play().catch(() => {});
+      somGameOver.value.play().catch(() => { });
     }
+    window.addEventListener("keydown", onKeyDown);
   }
 }
 
@@ -736,15 +696,21 @@ function emitirVitoria() {
   emit("vencerNivel");
   // Ao vencer a fase, você pode incrementar `faseAtual.value++` para mudar o boss:
   faseAtual.value++;
+
 }
 
 // ──────────────────────────────────────────────────────────────
 // Reiniciar Jogo
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
+  limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
+  playerKey.value++;
+  // Reset de vidas e estados visuais
   vidas.splice(0, vidas.length, true, true, true);
-  poderes.splice(0, poderes.length);
+  poderes.value.splice(0, poderes.value.length);
   poderVisivel.value = false;
+
+  // Reset de moedas e perguntas
   mostrarMoeda.value = false;
   mostrarMoedaPrata.value = false;
   mostrarMoedaDourada.value = false;
@@ -753,29 +719,93 @@ function reiniciarJogo() {
   mostrarPerguntaDourada.value = false;
   respostaDigitada.value = "";
   tempoRestAnte.value = 10;
+
+  // Reset de posição do player e do boss
   playerX.value = 50;
   jumpY.value = 0;
-  gameOver.value = false;
+  bossX.value = window.innerWidth - 400;
 
-  // Corrigido: não retornar para a tela de menu
+  // Reset de controle de jogo
+  gameOver.value = false;
+  invulneravel.value = false;
+  perguntaPausandoJogo.value = false;
+  jogoPausado.value = false;
+
+  // Reset do frame loop e timers
+  cancelAnimationFrame(frameLoop);
+  frameLoop = requestAnimationFrame(gameLoop);
+
+  // Garantir que não há duplicação de evento
+  window.removeEventListener("keydown", onKeyDown);
+  window.removeEventListener("keyup", onKeyUp);
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
+
+  // Música
+  if (somNivel1.value && somAtivo.value) {
+    somNivel1.value.currentTime = 0;
+    somNivel1.value.play().catch(() => {});
+  }
+
+  // Retorna à tela do jogo (caso esteja vindo do Game Over ou Menu)
   telaAtual.value = "jogo";
 }
+
+
 
 
 // ──────────────────────────────────────────────────────────────
 // Limpar estados ao desmontar / mudar fase
 // ──────────────────────────────────────────────────────────────
-function limparJogo() {
-  window.removeEventListener("keydown", onKeyDown);
-  window.removeEventListener("keyup", onKeyUp);
-  if (frameLoop) cancelAnimationFrame(frameLoop);
-  if (timerPergunta) clearInterval(timerPergunta);
-  if (moedaAnimacao) clearInterval(moedaAnimacao);
-  if (animacaoPrata) clearInterval(animacaoPrata);
-  if (animacaoDourada) clearInterval(animacaoDourada);
-  if (somNivel1.value) somNivel1.value.pause();
-  if (tiroAnimFrame) cancelAnimationFrame(tiroAnimFrame);
+function limparJogo({ manterTeclado = false } = {}) {
+  if (!manterTeclado) {
+    window.removeEventListener("keydown", onKeyDown);
+    window.removeEventListener("keyup", onKeyUp);
+  }
+
+  // Limpar loops e timers
+  cancelAnimationFrame(frameLoop);
+  cancelAnimationFrame(tiroAnimFrame);
+  clearInterval(timerPergunta);
+  clearInterval(moedaAnimacao);
+  clearInterval(animacaoPrata);
+  clearInterval(animacaoDourada);
+
+  // Resetar sons
+  if (somNivel1.value) {
+    somNivel1.value.pause();
+    somNivel1.value.currentTime = 0;
+  }
+  if (somRelogio.value) somRelogio.value.pause();
+
+  // Resetar poderes
+  poderes.value.splice(0, poderes.value.length);
+  poderVisivel.value = false;
+
+  // Resetar moedas e perguntas
+  mostrarMoeda.value = false;
+  mostrarMoedaPrata.value = false;
+  mostrarMoedaDourada.value = false;
+  mostrarPergunta.value = false;
+  mostrarPerguntaPrata.value = false;
+  mostrarPerguntaDourada.value = false;
+  respostaDigitada.value = "";
+  tempoRestAnte.value = 10;
+
+  // Reset de estados globais
+  invulneravel.value = false;
+  jogoPausado.value = false;
+  perguntaPausandoJogo.value = false;
+
+  // Frame loops zerados
+  frameLoop = null;
+  tiroAnimFrame = null;
+  timerPergunta = null;
+  moedaAnimacao = null;
+  animacaoPrata = null;
+  animacaoDourada = null;
 }
+
 
 // ──────────────────────────────────────────────────────────────
 // Liga/Desliga Som
@@ -783,7 +813,7 @@ function limparJogo() {
 function toggleSom() {
   if (!somNivel1.value) return;
   somAtivo.value = !somAtivo.value;
-  if (somAtivo.value) somNivel1.value.play().catch(() => {});
+  if (somAtivo.value) somNivel1.value.play().catch(() => { });
   else somNivel1.value.pause();
 }
 
@@ -798,7 +828,7 @@ function togglePause() {
     if (frameLoop) cancelAnimationFrame(frameLoop); // Impedir o jogo ficar funcionando quando estiver pausado
   } else {
     if (somAtivo.value && somNivel1.value)
-      somNivel1.value.play().catch(() => {});
+      somNivel1.value.play().catch(() => { });
     if (!perguntaPausandoJogo.value)
       frameLoop = requestAnimationFrame(gameLoop);
   }
@@ -822,9 +852,10 @@ watch(telaAtual, (t) => {
 onBeforeUnmount(() => limparJogo());
 
 onMounted(() => {
+  iniciarJogo();
   const tentarTocarSom = () => {
     if (telaAtual.value === "jogo" && somNivel1.value && somAtivo.value) {
-      somNivel1.value.play().catch(() => {});
+      somNivel1.value.play().catch(() => { });
     }
     window.removeEventListener("click", tentarTocarSom);
   };
@@ -901,11 +932,10 @@ function levarDano() {
 
 .poder {
   position: absolute;
-  bottom: 160px;
-  height: 80px; /* ajuste conforme tamanho do sprite do poder */
-  transition: right 0.05s;
+  height: 80px;
   z-index: 2;
   image-rendering: pixelated;
+  border: 1px solid red;
 }
 
 .btn-som {

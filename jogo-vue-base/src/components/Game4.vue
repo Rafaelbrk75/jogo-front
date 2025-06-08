@@ -50,4 +50,23 @@ const moedas = {
   ],
 };
 
+function limparJogo() {
+  console.log("🧹 limpando jogo na fase 2...");
+
+  // Remove listeners adicionados no GameTemplate
+  window.removeEventListener("keydown", onKeyDown);
+  window.removeEventListener("keyup", onKeyUp);
+
+  // Cancela animações e timers do jogo, se algum estiver ativo
+  cancelAnimationFrame(window.frameLoopId || 0);
+  clearInterval(window.moedaAnimacaoId || 0);
+  clearInterval(window.animacaoPrataId || 0);
+  clearInterval(window.animacaoDouradaId || 0);
+  clearInterval(window.timerPerguntaId || 0);
+}
+
+// Garante que a limpeza seja feita ao sair da fase
+
+
+
 </script>

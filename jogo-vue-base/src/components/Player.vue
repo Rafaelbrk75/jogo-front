@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 
 const emit = defineEmits(["update:x", "update:y", "update:direcao", "update:estado"]);
 
@@ -20,6 +20,20 @@ const props = defineProps({
 
 const x = ref(props.initialX);
 const y = ref(props.initialY);
+watch(
+  () => props.initialX,
+  (novoX) => {
+    x.value = novoX;
+  }
+);
+
+watch(
+  () => props.initialY,
+  (novoY) => {
+    y.value = novoY;
+  }
+);
+
 const speed = 6;
 const jumpForce = 35;
 const gravity = 0.8;
@@ -37,6 +51,8 @@ const playerX = ref(50);
 function atualizarX(novoX) {
   playerX.value = novoX;
 }
+
+
 
 // SPRITES ESTÁTICOS POR DIREÇÃO
 const sprites = {
@@ -157,6 +173,23 @@ onBeforeUnmount(() => {
   window.removeEventListener("keyup", onKeyUp);
   if (rafId) cancelAnimationFrame(rafId);
 });
+
+watch(
+  () => props.pausado,
+  (novo) => {
+    if (novo) {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    } else {
+      if (!rafId) {
+        rafId = requestAnimationFrame(gameLoop);
+      }
+    }
+  }
+);
+
 
 
 </script>

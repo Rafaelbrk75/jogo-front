@@ -48,4 +48,5 @@ const moedas = {
     "/moedaDourada4.png",
   ],
 };
+
 </script>

@@ -1,9 +1,9 @@
 <template>
     <Menu v-if="faseAtual === 0" @start="iniciarFase" />
-    <Game1 v-else-if="faseAtual === 1" @vencerNivel="faseAtual = 2" />
-    <Game2 v-else-if="faseAtual === 2" @vencerNivel="faseAtual = 3" />
-    <Game3 v-else-if="faseAtual === 3" @vencerNivel="faseAtual = 4" />
-    <Game4 v-else-if="faseAtual === 4" @vencerNivel="faseAtual = 1" />
+    <Game1 v-else-if="faseAtual === 1" @vencerNivel="faseAtual = 2" key="fase1" />
+    <Game2 v-else-if="faseAtual === 2" @vencerNivel="faseAtual = 3" key="fase2" />
+    <Game3 v-else-if="faseAtual === 3" @vencerNivel="faseAtual = 4" key="fase3" />
+    <Game4 v-else-if="faseAtual === 4" @vencerNivel="faseAtual = 1" key="fase4" />
 </template>
 
 <script setup>

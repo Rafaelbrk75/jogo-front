@@ -13,6 +13,7 @@
 </template>
 
 <script setup>
+import { onBeforeUnmount } from 'vue'
 import GameTemplate from "./GameTemplate.vue";
 import Boss3 from "./Boss3.vue";    
 
@@ -49,5 +50,7 @@ const moedas = {
     "/fase3/moedaDourada4.png",
   ],
 };
+
+// Garante que a limpeza seja feita ao sair da fase
 
 </script>
