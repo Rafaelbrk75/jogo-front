@@ -52,8 +52,6 @@ function atualizarX(novoX) {
   playerX.value = novoX;
 }
 
-
-
 // SPRITES ESTÁTICOS POR DIREÇÃO
 const sprites = {
   direita: "/player.png",
@@ -174,6 +172,21 @@ onBeforeUnmount(() => {
   if (rafId) cancelAnimationFrame(rafId);
 });
 
+watch(
+  () => props.pausado,
+  (novo) => {
+    if (novo) {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    } else {
+      if (!rafId) {
+        rafId = requestAnimationFrame(gameLoop);
+      }
+    }
+  }
+);
 </script>
 
 <style scoped>

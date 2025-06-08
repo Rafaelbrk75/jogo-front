@@ -935,7 +935,6 @@ function levarDano() {
   height: 80px;
   z-index: 2;
   image-rendering: pixelated;
-  border: 1px solid red;
 }
 
 .btn-som {
