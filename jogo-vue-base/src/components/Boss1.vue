@@ -50,10 +50,15 @@ function startFiring() {
     // Emite o evento de disparo com os parâmetros corretos
 
     emit("fire-power", {
-      sprite: "/fase1/poder-binario.png",
-      speed: 7,
-      x: posX,
-      y: posY,
+      frames: [
+    "/fase1/poder-binario.png",
+    "/fase1/poder-binario2.png",
+    "/fase1/poder-binario3.png",
+    "/fase1/poder-binario4.png",
+  ],
+  speed: 7,
+  x: posX,
+  y: posY
     });
   }, 2000);
 }

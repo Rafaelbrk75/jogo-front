@@ -39,7 +39,7 @@ O projeto foi desenvolvido utilizando as seguintes tecnologias:
 - **Pedro H. G. Cavalini** – Design dos cenários e construção das fases  
 - **Rafael R. O. Santos** – Programação da movimentação e mecânica dos obstáculos  
 - **Vitor H. Assis da Silva** – Organização do projeto, estrutura geral e documentação
-- **Kauan Marcolino Garcia** - 
+- **Kauan Marcolino Garcia** – Desenvolvimento geral, prompts e lógica do jogo
 
 ---
 
