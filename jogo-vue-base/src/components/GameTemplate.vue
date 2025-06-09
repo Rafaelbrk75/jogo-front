@@ -61,15 +61,20 @@
           @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
           @update:estado="onPlayerEstado($event)" />
 
-        <!-- Poder (vindo do Boss) -->
-        <img v-if="poderVisivel" ref="poder" :src="poderSprite" alt="Poder" class="poder"
-          :style="{ right: poderX + 'px' }" />
+        <AnimatedPoder
+         v-for="(poder, index) in poderes"
+        :key="index"
+        :x="poder.x"
+       :y="poder.y"
+        :frames="poder.frames"
+        :frame-delay="100"
+        :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }"
+
+/>
 
 
-        <!-- Renderiza todos os poderes ativos do boss -->
-        <img v-for="(poder, idx) in poderes" :key="idx" :src="poder.sprite" class="poder"
-          :style="{ left: (poder.x || 0) + 'px', bottom: (typeof poder.y === 'number' ? poder.y : 0) + 'px' }" />
 
+       
         <!-- Tiro de Laser do Player -->
         <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
           :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
@@ -127,6 +132,8 @@ import Player from "./Player.vue";
 // Importamos as fases de Boss
 import BossFase1 from "./Boss1.vue";
 import BossFase2 from "./Boss2.vue";
+import AnimatedPoder from "./AnimatedPoder.vue";
+
 
 const props = defineProps({
   exibirMenu: { type: Boolean, default: false }, // ← ADICIONADO
@@ -297,18 +304,18 @@ function iniciarJogo() {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Quando o BossFaseX emitir “fire-power” com { sprite, speed }
+// Quando o BossFaseX emitir “fire-power” com { frames, speed }
 // chamamos esta função para animar o “poder” no canvas
 // ──────────────────────────────────────────────────────────────
 
-function startBossPower({ sprite, speed, x, y }) {
+function startBossPower({ frames, speed, x, y }) {
   const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
   const poderY = typeof y === "number" ? y : 300;
 
   console.log("🔥 Poder ajustado:", poderX, poderY);
 
   poderes.value.push({
-    sprite,
+    frames,
     x: poderX,
     y: poderY,
     speed
