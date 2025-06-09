@@ -1,13 +1,14 @@
 <template>
   <div>
     <!-- Tela de Menu -->
-    <Menu v-if="telaAtual === 'menu'" @start="exibirIntro" />
+    <Menu v-if="faseAtual === 1 && telaAtual === 'menu'" @start="exibirIntro" />
 
     <!-- HQ de Introdução -->
     <div v-else-if="telaAtual === 'intro'" class="intro-hq">
-      <img src="/fase1/hq-intro.png" class="hq-img" alt="HQ Intro" />
+      <img :src="`/fase${faseAtual}/hq-intro.png`" class="hq-img" alt="HQ Intro" />
       <button class="btn-skip" @click="pularIntro">PULAR</button>
     </div>
+
 
     <!-- Tela de Jogo -->
     <div v-else-if="telaAtual === 'jogo'" class="cenario" :style="{ backgroundImage: `url('${cenario}')` }">
@@ -22,91 +23,84 @@
       </div>
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
-      <component 
-        :is="bossComponent" 
-        :key="faseAtual" 
-        class="boss"
-        :initialX="bossX"
-        @update:x="bossX = $event"
-        @fire-power="startBossPower"
-        @tocarPlayer="levarDano"
-        />
+      <component :is="bossComponent" :key="faseAtual" class="boss" :initialX="bossX" @update:x="bossX = $event"
+        @fire-power="startBossPower" @tocarPlayer="levarDano" />
 
 
-        <!-- Sombra do Player -->
-        <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 45 + 'px', bottom: '-50px' }" />
+      <!-- Sombra do Player -->
+      <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 45 + 'px', bottom: '-50px' }" />
 
-        <!-- Moedas -->
-        <img v-if="mostrarMoeda" :src="moedas.bronze[moedaFrame - 1]" alt="Moeda Girando" class="moeda-girando" />
-        <img v-if="mostrarMoedaPrata" :src="moedas.prata[moedaPrataFrame - 1]" alt="Moeda Prata Girando"
-          class="moeda-girando" />
-        <img v-if="mostrarMoedaDourada" :src="moedas.dourada[moedaDouradaFrame - 1]" class="moeda-girando-dourada" />
+      <!-- Moedas -->
+      <img v-if="mostrarMoeda" :src="moedas.bronze[moedaFrame - 1]" alt="Moeda Girando" class="moeda-girando" />
+      <img v-if="mostrarMoedaPrata" :src="moedas.prata[moedaPrataFrame - 1]" alt="Moeda Prata Girando"
+        class="moeda-girando" />
+      <img v-if="mostrarMoedaDourada" :src="moedas.dourada[moedaDouradaFrame - 1]" class="moeda-girando-dourada" />
 
-        <!-- Perguntas -->
-        <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
-          <img :src="perguntaBronze.imagem" class="img-pergunta" />
-          <div class="contador">{{ tempoRestAnte }}</div>
-        </div>
-        <div v-if="mostrarPerguntaPrata" class="pergunta-overlay" @click.stop>
-          <img :src="perguntaPrata.imagem" class="img-pergunta" />
-          <div class="contador">{{ tempoRestAnte }}</div>
-        </div>
-        <div v-if="mostrarPerguntaDourada" class="pergunta-overlay" @click.stop>
-          <img :src="perguntaDourada.imagem" class="img-pergunta" />
-          <div class="contador">{{ tempoRestAnte }}</div>
-        </div>
+      <!-- Perguntas -->
+      <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
+        <img :src="perguntaBronze.imagem" class="img-pergunta" />
+        <div class="contador">{{ tempoRestAnte }}</div>
+      </div>
+      <div v-if="mostrarPerguntaPrata" class="pergunta-overlay" @click.stop>
+        <img :src="perguntaPrata.imagem" class="img-pergunta" />
+        <div class="contador">{{ tempoRestAnte }}</div>
+      </div>
+      <div v-if="mostrarPerguntaDourada" class="pergunta-overlay" @click.stop>
+        <img :src="perguntaDourada.imagem" class="img-pergunta" />
+        <div class="contador">{{ tempoRestAnte }}</div>
+      </div>
 
-        <!-- Player (envia posição/estado via eventos emitidos) -->
-        <Player :initialX="playerX" :initialY="jumpY" :pausado="jogoPausado || perguntaPausandoJogo"
-          @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
-          @update:estado="onPlayerEstado($event)" />
+      <!-- Player (envia posição/estado via eventos emitidos) -->
+      <Player :initialX="playerX" :initialY="jumpY" :pausado="jogoPausado || perguntaPausandoJogo"
+        @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
+        @update:estado="onPlayerEstado($event)" />
 
-        <!-- Poder (vindo do Boss) -->
-        <img v-if="poderVisivel" ref="poder" :src="poderSprite" alt="Poder" class="poder"
-          :style="{ right: poderX + 'px' }" />
+      <!-- Poder (vindo do Boss) -->
+      <img v-if="poderVisivel" ref="poder" :src="poderSprite" alt="Poder" class="poder"
+        :style="{ right: poderX + 'px' }" />
 
 
-        <!-- Renderiza todos os poderes ativos do boss -->
-        <img v-for="(poder, idx) in poderes" :key="idx" :src="poder.sprite" class="poder"
-          :style="{ left: (poder.x || 0) + 'px', bottom: (typeof poder.y === 'number' ? poder.y : 0) + 'px' }" />
+      <!-- Renderiza todos os poderes ativos do boss -->
+      <img v-for="(poder, idx) in poderes" :key="idx" :src="poder.sprite" class="poder"
+        :style="{ left: (poder.x || 0) + 'px', bottom: (typeof poder.y === 'number' ? poder.y : 0) + 'px' }" />
 
-        <!-- Tiro de Laser do Player -->
-        <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
-          :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
+      <!-- Tiro de Laser do Player -->
+      <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
+        :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
 
-        <!-- Áudios -->
-        <audio ref="somNivel1" :src="musica" loop />
-        <audio ref="somImpacto" src="/somImpacto.mp3" />
-        <audio ref="somGameOver" src="/gameover.mp3" />
-        <audio ref="somAgachando" src="/somAgachando.mp3" />
-        <audio ref="somPulo" src="/somPulo.mp3" />
-        <audio ref="somMoeda" src="/public/somMoeda.wav" />
-        <audio ref="somAcerto" src="/somAcerto.wav" />
-        <audio ref="somPerda" src="/somPerda.mp3" />
-        <audio ref="somRelogio" src="/somRelogio.mp3" />
+      <!-- Áudios -->
+      <audio ref="somNivel1" :src="musica" loop />
+      <audio ref="somImpacto" src="/somImpacto.mp3" />
+      <audio ref="somGameOver" src="/gameover.mp3" />
+      <audio ref="somAgachando" src="/somAgachando.mp3" />
+      <audio ref="somPulo" src="/somPulo.mp3" />
+      <audio ref="somMoeda" src="/public/somMoeda.wav" />
+      <audio ref="somAcerto" src="/somAcerto.wav" />
+      <audio ref="somPerda" src="/somPerda.mp3" />
+      <audio ref="somRelogio" src="/somRelogio.mp3" />
 
-        <!-- Botão de Som -->
-        <button @click.stop="toggleSom" class="btn-som">
-          <img :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'" alt="Som" />
+      <!-- Botão de Som -->
+      <button @click.stop="toggleSom" class="btn-som">
+        <img :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'" alt="Som" />
+      </button>
+
+      <!-- Overlay de Pause -->
+      <div v-if="jogoPausado" class="pause-overlay">
+        <img src="/telaPause.png" class="img-pause" alt="Pausado" />
+        <button v-if="jogoPausado" class="btn-continuar" @click.stop="togglePause">
+          CONTINUAR
         </button>
+      </div>
 
-        <!-- Overlay de Pause -->
-        <div v-if="jogoPausado" class="pause-overlay">
-          <img src="/telaPause.png" class="img-pause" alt="Pausado" />
-          <button v-if="jogoPausado" class="btn-continuar" @click.stop="togglePause">
-            CONTINUAR
+      <!-- Tela de Game Over -->
+      <div v-if="gameOver" class="game-over-overlay">
+        <div class="game-over-container">
+          <img src="/imgGameOver.png" class="img-game-over" alt="Game Over" />
+          <button class="btn-reiniciar" @click="reiniciarJogo">
+            REINICIAR
           </button>
         </div>
-
-        <!-- Tela de Game Over -->
-        <div v-if="gameOver" class="game-over-overlay">
-          <div class="game-over-container">
-            <img src="/imgGameOver.png" class="img-game-over" alt="Game Over" />
-            <button class="btn-reiniciar" @click="reiniciarJogo">
-              REINICIAR
-            </button>
-          </div>
-        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -143,7 +137,9 @@ const playerKey = ref(0);
 // ──────────────────────────────────────────────────────────────
 // Estados principais do GameTemplate
 // ──────────────────────────────────────────────────────────────
-const telaAtual = ref(props.exibirMenu ? "menu" : "jogo");
+
+
+
 let introTimeoutId = null;
 
 const vidas = reactive([true, true, true]);
@@ -159,8 +155,8 @@ const estaAgachado = ref(false);
 const groundedGlob = ref(true);
 
 // Variável que controla em que fase estamos (1 ou 2 neste exemplo)
-const faseAtual = ref(1);
-
+const faseAtual = ref(1); // sempre começa no menu
+const telaAtual = ref(faseAtual.value === 1 ? "menu" : "jogo");
 // Computed para eleger o boss correspondente a cada fase
 const componenteBoss = computed(() => {
   return faseAtual.value === 1 ? BossFase1 : BossFase2;
@@ -234,7 +230,10 @@ function exibirIntro() {
   telaAtual.value = "intro";
   clearTimeout(introTimeoutId);
   introTimeoutId = setTimeout(() => {
-    if (telaAtual.value === "intro") iniciarJogo();
+    // depois de 8s, inicia o jogo da fase atual
+    if (telaAtual.value === "intro") {
+      iniciarJogo();
+    }
   }, 8000);
 }
 
@@ -249,7 +248,6 @@ function pularIntro() {
 // ──────────────────────────────────────────────────────────────
 function iniciarJogo() {
   telaAtual.value = "jogo";
-
   // Tocar música de fundo
   if (somNivel1.value) {
     somNivel1.value.currentTime = 0;
@@ -697,6 +695,9 @@ function emitirVitoria() {
   // Ao vencer a fase, você pode incrementar `faseAtual.value++` para mudar o boss:
   faseAtual.value++;
 
+  telaAtual.value = "intro";
+  clearTimeout(introTimeoutId);
+  exibirIntro();
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -744,7 +745,7 @@ function reiniciarJogo() {
   // Música
   if (somNivel1.value && somAtivo.value) {
     somNivel1.value.currentTime = 0;
-    somNivel1.value.play().catch(() => {});
+    somNivel1.value.play().catch(() => { });
   }
 
   // Retorna à tela do jogo (caso esteja vindo do Game Over ou Menu)
@@ -849,10 +850,13 @@ watch(telaAtual, (t) => {
   }
 });
 
-onBeforeUnmount(() => limparJogo());
+onBeforeUnmount(() => {
+  clearTimeout(introTimeout);
+  limparJogo();
+});
 
 onMounted(() => {
-  iniciarJogo();
+  exibirIntro();
   const tentarTocarSom = () => {
     if (telaAtual.value === "jogo" && somNivel1.value && somAtivo.value) {
       somNivel1.value.play().catch(() => { });
