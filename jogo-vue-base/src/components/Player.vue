@@ -57,7 +57,7 @@ const sprites = {
   direita: "/player.png",
   esquerda: "/bonecoVoltando.png",
   pulandoDireita: "/playerGiro.png",
-  pulandoEsquerda: "/jumpVoltando.jpg",
+  pulandoEsquerda: "/jumpVoltando.png",
   agachadoDireita: "/agachado.png",
   agachadoEsquerda: "/agachado2.png",
 };
