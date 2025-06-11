@@ -16,6 +16,10 @@ Com base nisso, a IA gerou uma HQ de 6 quadros em pixel art retrô. O Pedro e o 
 
 ---
 
+## 🚀 TECNOLOGIAS UTILIZADAS
+
+Utilizamos Vue.js, um framework JavaScript, para desenvolver o nosso jogo.
+
 ## 🔄 VERSIONAMENTO
 
 Utilizamos o **Git** para controle de versão, conforme aprendemos nas aulas do professor Hugo Fumero. Nosso primeiro repositório teve alguns problemas de conflitos nos commits. Por isso, criamos um novo repositório no perfil do Rafael, que passou a organizar o fluxo principal.
@@ -68,7 +72,6 @@ Mesmo com os desafios, entregamos um jogo funcional, original e com identidade p
 
 - **Vitor H. Assis da Silva**  
   GitHub: [vitorhassis](https://github.com/vitorhassis)  
-  Email: vitorassis997@gmail.com
 
 - **Rafael R. O. Santos**  
   GitHub: [Rafaelbrk75](https://github.com/Rafaelbrk75)
