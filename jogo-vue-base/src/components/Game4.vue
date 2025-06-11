@@ -36,22 +36,22 @@ const perguntas = {
 
 const moedas = {
   bronze: [
-    "/fase4/moedaBronze1.png",
-    "/fase4/moedaBronze2.png",
-    "/fase4/moedaBronze3.png",
-    "/fase4/moedaBronze4.png",
+    "/moedaBronze1.png",
+    "/moedaBronze2.png",
+    "/moedaBronze3.png",
+    "/moedaBronze4.png",
   ],
   prata: [
-    "/fase4/moedaPrata1.png",
-    "/fase4/moedaPrata2.png",
-    "/fase4/moedaPrata3.png",
-    "/fase4/moedaPrata4.png",
+    "/moedaPrata1.png",
+    "/moedaPrata2.png",
+    "/moedaPrata3.png",
+    "/moedaPrata4.png",
   ],
   dourada: [
-    "/fase4/moedaDourada1.png",
-    "/fase4/moedaDourada2.png",
-    "/fase4/moedaDourada3.png",
-    "/fase4/moedaDourada4.png",
+    "/moedaDourada1.png",
+    "/moedaDourada2.png",
+    "/moedaDourada3.png",
+    "/moedaDourada4.png",
   ],
 };
 
