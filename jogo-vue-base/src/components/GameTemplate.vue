@@ -55,13 +55,18 @@
         @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
         @update:estado="onPlayerEstado($event)" />
 
-      <!-- Poder (vindo do Boss) -->
-      <AnimatedPoder v-for="(poder, index) in poderes" :key="index" :x="poder.x" :y="poder.y" :frames="poder.frames"
-        :frame-delay="100" :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }" />
+        <!-- Poder (vindo do Boss) -->
+        <img v-if="poderVisivel" ref="poder" :src="poderSprite" alt="Poder" class="poder"
+          :style="{ right: poderX + 'px' }" />
 
-      <!-- Tiro de Laser do Player -->
-      <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
-        :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
+
+        <!-- Renderiza todos os poderes ativos do boss -->
+        <img v-for="(poder, idx) in poderes" :key="idx" :src="poder.sprite" class="poder"
+          :style="{ left: (poder.x || 0) + 'px', bottom: (typeof poder.y === 'number' ? poder.y : 0) + 'px' }" />
+
+        <!-- Tiro de Laser do Player -->
+        <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
+          :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
 
       <!-- Áudios -->
       <audio ref="somNivel1" :src="musica" loop />
@@ -116,7 +121,6 @@ import Player from "./Player.vue";
 // Importamos as fases de Boss
 import BossFase1 from "./Boss1.vue";
 import BossFase2 from "./Boss2.vue";
-import AnimatedPoder from "./AnimatedPoder.vue";
 
 const props = defineProps({
   fase: { type: Number, required: true },
@@ -297,7 +301,7 @@ function iniciarJogo() {
 }
 
 // ──────────────────────────────────────────────────────────────
-// Quando o BossFaseX emitir “fire-power” com { sprite, speed }
+// Quando o BossFaseX emitir “fire-power” com { frames, speed }
 // chamamos esta função para animar o “poder” no canvas
 // ──────────────────────────────────────────────────────────────
 
@@ -546,13 +550,7 @@ function encerrarPergunta(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => {});
-      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta bronze ---
-      if (bossVida.value > 0) {
-        bossVida.value--; // Reduz a vida do boss em 1
-        console.log("Boss levou 1 de dano pela pergunta bronze! Vida atual:", bossVida.value);
-      }
-      // ---------------------------------------------------------------------
+      somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -606,13 +604,7 @@ function encerrarPerguntaPrata(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => {});
-      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta prata ---
-      if (bossVida.value > 0) {
-        bossVida.value-=2; // Reduz a vida do boss em 2
-        console.log("Boss levou 1 de dano pela pergunta prata! Vida atual:", bossVida.value);
-      }
-      // -------------------------------------------------------------------
+      somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -634,7 +626,6 @@ function encerrarPerguntaPrata(acertou) {
     }, 150);
   }, 4000);
 }
-
 // ──────────────────────────────────────────────────────────────
 // Pergunta Dourada
 // ──────────────────────────────────────────────────────────────
@@ -666,13 +657,7 @@ function encerrarPerguntaDourada(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => {});
-      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta dourada ---
-      if (bossVida.value > 0) {
-        bossVida.value-=4; // Reduz a vida do boss em 1
-        console.log("Boss levou 1 de dano pela pergunta dourada! Vida atual:", bossVida.value);
-      }
-      // ----------------------------------------------------------------------
+      somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -689,7 +674,6 @@ function encerrarPerguntaDourada(acertou) {
 
   frameLoop = requestAnimationFrame(gameLoop);
 }
-
 // ──────────────────────────────────────────────────────────────
 // Verifica Game Over
 // ──────────────────────────────────────────────────────────────
@@ -768,8 +752,6 @@ function reiniciarJogo() {
   // Retorna à tela do jogo (caso esteja vindo do Game Over ou Menu)
   telaAtual.value = "jogo";
 }
-
-
 
 
 // ──────────────────────────────────────────────────────────────
@@ -1089,7 +1071,6 @@ function levarDano() {
 
 .img-pergunta {
   width: 500px;
-  image-rendering: pixelated;
   pointer-events: none;
 }
 

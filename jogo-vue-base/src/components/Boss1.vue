@@ -63,9 +63,6 @@ function startFiring() {
   }, 2000);
 }
 
-
-
-
 onMounted(async () => {
   await nextTick();
   const img = bossBaseRef.value?.bossImg?.value;

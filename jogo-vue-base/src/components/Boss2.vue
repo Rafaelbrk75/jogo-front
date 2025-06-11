@@ -32,7 +32,7 @@ const spriteAlternado = ref("/fase2/bossVoltandoGrau.png");
 
 // Som da moto
 const roncoMoto = new Audio("/fase2/roncoMoto.mp3");
-roncoMoto.volume = 1.0;
+roncoMoto.volume = 0.2;
 roncoMoto.loop = true;
 let somTocou = false;
 
@@ -56,7 +56,7 @@ onMounted(() => {
   intervaloBoss = setInterval(() => {
     if (!bossPodeAndar) return;
 
-    bossX.value += direcaoBoss * 25;
+    bossX.value += direcaoBoss * 10;
 
     if (bossX.value <= limiteEsquerdo) {
       // Vai mudar pra direita
@@ -80,13 +80,13 @@ onMounted(() => {
       const r1 = playerEl.getBoundingClientRect();
       const r2 = bossEl.getBoundingClientRect();
 
-      // Expande a hitbox da moto em 10px para cada lado
+      // Expande a hitbox da moto em 20px para cada lado
       const r2Expandido = {
-        left: r2.left - 10,
-        right: r2.right + 10,
-        top: r2.top - 10,
-        bottom: r2.bottom + 10,
-      };
+  left: r2.left + 20,
+  right: r2.right - 20,
+  top: r2.top + 20,      // Encurta por cima
+  bottom: r2.bottom - 20 // Encurta por baixo
+};
 
       const colidiu =
         r1.left < r2Expandido.right &&
