@@ -35,8 +35,8 @@ watch(
 );
 
 const speed = 6;
-const jumpForce = 35;
-const gravity = 0.8;
+const jumpForce = 30;
+const gravity = 0.6;
 let velocityY = 0;
 const somPulo = new Audio("/somPulo.mp3");
 somPulo.volume = 1.0;

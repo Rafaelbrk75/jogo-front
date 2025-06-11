@@ -1086,7 +1086,6 @@ function levarDano() {
 
 .img-pergunta {
   width: 500px;
-  image-rendering: pixelated;
   pointer-events: none;
 }
 
