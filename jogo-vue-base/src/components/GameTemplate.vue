@@ -55,18 +55,13 @@
         @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
         @update:estado="onPlayerEstado($event)" />
 
-        <!-- Poder (vindo do Boss) -->
-        <img v-if="poderVisivel" ref="poder" :src="poderSprite" alt="Poder" class="poder"
-          :style="{ right: poderX + 'px' }" />
+      <!-- Poder (vindo do Boss) -->
+      <AnimatedPoder v-for="(poder, index) in poderes" :key="index" :x="poder.x" :y="poder.y" :frames="poder.frames"
+        :frame-delay="100" :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }" />
 
-
-        <!-- Renderiza todos os poderes ativos do boss -->
-        <img v-for="(poder, idx) in poderes" :key="idx" :src="poder.sprite" class="poder"
-          :style="{ left: (poder.x || 0) + 'px', bottom: (typeof poder.y === 'number' ? poder.y : 0) + 'px' }" />
-
-        <!-- Tiro de Laser do Player -->
-        <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
-          :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
+      <!-- Tiro de Laser do Player -->
+      <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
+        :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
 
       <!-- Áudios -->
       <audio ref="somNivel1" :src="musica" loop />
@@ -121,6 +116,7 @@ import Player from "./Player.vue";
 // Importamos as fases de Boss
 import BossFase1 from "./Boss1.vue";
 import BossFase2 from "./Boss2.vue";
+import AnimatedPoder from "./AnimatedPoder.vue";
 
 const props = defineProps({
   fase: { type: Number, required: true },
@@ -553,7 +549,7 @@ function encerrarPergunta(acertou) {
       somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => {});
+      somPerda.value.play().catch(() => { });
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -607,7 +603,7 @@ function encerrarPerguntaPrata(acertou) {
       somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => {});
+      somPerda.value.play().catch(() => { });
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -660,7 +656,7 @@ function encerrarPerguntaDourada(acertou) {
       somAcerto.value.play().catch(() => { });
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => {});
+      somPerda.value.play().catch(() => { });
       let perdidas = 0;
       for (let i = 0; i < vidas.length && perdidas < 3; i++) {
         if (vidas[i]) {
