@@ -1,5 +1,6 @@
 <template>
   <GameTemplate
+    :fase="fase"           
     :exibirMenu="false"
     :cenario="cenario"
     :musica="musica"
@@ -8,49 +9,40 @@
     :perguntas="perguntas"
     :moedas="moedas"
     @vencerNivel="$emit('vencerNivel')"
-/>
-
+  />
 </template>
 
 <script setup>
-import { onBeforeUnmount } from 'vue'
 import GameTemplate from "./GameTemplate.vue";
 import Boss3 from "./Boss3.vue";    
 
+// 1. RECEBER A PROP fase
+const props = defineProps({
+  fase: { type: Number, required: true }
+});
+
+// 2. PROPAGAR O EVENTO pro pai
 const emit = defineEmits(["vencerNivel"]);
+
+// ... suas constantes de cenário, áudio, perguntas, moedas
 
 const cenario = "/fase3/cenario3.png";
 const musica = "/fase3/nivel3.mp3";
-const bossVidaInicial = 5;
+const bossVidaInicial = 3;
 
-// As perguntas e moedas são definidas diretamente no componente Game3
-const perguntas = { 
-  bronze: { resposta: "b", imagem: "/fase3/imgPerguntaBronze.png" },
-  prata: { resposta: "c", imagem: "/fase3/perguntaPrata.png" },
-  dourada: { resposta: "c", imagem: "/fase3/perguntaDourada.png" },
+// Perguntas
+const perguntas = {
+  bronze: { resposta: "7", imagem: "/fase3/imgPerguntaBronze.png" },
+  prata: { resposta: "8", imagem: "/fase3/perguntaPrata.png" },
+  dourada: { resposta: "x", imagem: "/fase3/perguntaDourada.png" },
 };
-
+// Moedas
 const moedas = {
-  bronze: [
-    "/fase3/moedaBronze1.png",
-    "/fase3/moedaBronze2.png",
-    "/fase3/moedaBronze3.png",
-    "/fase3/moedaBronze4.png",
-  ],
-  prata: [
-    "/fase3/moedaPrata1.png",
-    "/fase3/moedaPrata2.png",
-    "/fase3/moedaPrata3.png",
-    "/fase3/moedaPrata4.png",
-  ],
-  dourada: [
-    "/fase3/moedaDourada1.png",
-    "/fase3/moedaDourada2.png",
-    "/fase3/moedaDourada3.png",
-    "/fase3/moedaDourada4.png",
-  ],
+  bronze: ["/fase3/moedaBronze1.png", "/fase3/moedaBronze2.png", "/fase3/moedaBronze3.png"],
+  prata: ["/fase3/moedaPrata1.png", "/fase3/moedaPrata2.png", "/fase3/moedaPrata3.png"],
+  dourada: ["/fase3/moedaDourada1.png", "/fase3/moedaDourada2.png", "/fase3/moedaDourada3.png"],
 };
 
-// Garante que a limpeza seja feita ao sair da fase
 
 </script>
+

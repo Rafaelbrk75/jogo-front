@@ -1,5 +1,6 @@
 <template>
   <GameTemplate
+    :fase="fase"
     :exibirMenu="false"
     :cenario="cenario"
     :musica="musica"
@@ -15,6 +16,10 @@
 <script setup>
 import GameTemplate from "./GameTemplate.vue";
 import Boss4 from "./Boss4.vue";
+
+const props = defineProps({
+  fase: { type: Number, required: true }
+});
 
 const emit = defineEmits(["vencerNivel"]);
 

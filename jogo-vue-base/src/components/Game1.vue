@@ -1,7 +1,7 @@
 <template>
   <GameTemplate
-    :exibirMenu="true"
-    :cenario="cenario"
+    :fase="fase"
+    :exibirMenu="props.mostrarMenuInicial" :cenario="cenario"
     :musica="musica"
     :bossVidaInicial="bossVidaInicial"
     :bossComponent="Boss1"
@@ -15,7 +15,11 @@
 import GameTemplate from "./GameTemplate.vue";
 import Boss1 from "./Boss1.vue";
 
-// declara que este componente também emite “vencerNivel”
+const props = defineProps({
+  fase: { type: Number, required: true },
+  mostrarMenuInicial: { type: Boolean, default: false } // <--- Aceita a nova prop
+});
+
 const emit = defineEmits(["vencerNivel"]);
 
 const cenario = "/fase1/cenario1.png";
@@ -48,5 +52,4 @@ const moedas = {
     "/moedaDourada4.png",
   ],
 };
-
 </script>

@@ -1,5 +1,6 @@
 <template>
   <GameTemplate
+    :fase="fase"
     :exibirMenu="false"
     :cenario="cenario"
     :musica="musica"
@@ -7,7 +8,6 @@
     :bossComponent="Boss2"
     :perguntas="perguntas"
     :moedas="moedas"
-    :fase="2"
     @tocarPlayer="levarDano"
     @vencerNivel="$emit('vencerNivel')"
   />
@@ -16,6 +16,10 @@
 <script setup>
 import GameTemplate from "./GameTemplate.vue";
 import Boss2 from "./Boss2.vue";
+
+const props = defineProps({
+  fase: { type: Number, required: true }
+});
 
 const emit = defineEmits(["vencerNivel"]);
 
@@ -57,6 +61,4 @@ const moedas = {
     "/fase2/moedaDourada4.png",
   ],
 };
-
-
 </script>

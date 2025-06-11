@@ -5,7 +5,7 @@
 
     <!-- HQ de Introdução -->
     <div v-else-if="telaAtual === 'intro'" class="intro-hq">
-      <img :src="`/fase${faseAtual}/hq-intro.png`" class="hq-img" alt="HQ Intro" />
+      <img :key="faseAtual" :src="`/fase${props.fase}/hq-intro.png`" class="hq-img" alt="HQ Intro" />
       <button class="btn-skip" @click="pularIntro">PULAR</button>
     </div>
 
@@ -56,13 +56,8 @@
         @update:estado="onPlayerEstado($event)" />
 
       <!-- Poder (vindo do Boss) -->
-      <img v-if="poderVisivel" ref="poder" :src="poderSprite" alt="Poder" class="poder"
-        :style="{ right: poderX + 'px' }" />
-
-
-      <!-- Renderiza todos os poderes ativos do boss -->
-      <img v-for="(poder, idx) in poderes" :key="idx" :src="poder.sprite" class="poder"
-        :style="{ left: (poder.x || 0) + 'px', bottom: (typeof poder.y === 'number' ? poder.y : 0) + 'px' }" />
+      <AnimatedPoder v-for="(poder, index) in poderes" :key="index" :x="poder.x" :y="poder.y" :frames="poder.frames"
+        :frame-delay="100" :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }" />
 
       <!-- Tiro de Laser do Player -->
       <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
@@ -112,7 +107,7 @@ import {
   computed,
   watch,
   onBeforeUnmount,
-  onMounted,
+  onMounted
 } from "vue";
 import Menu from "./Menu.vue";
 import Hud from "./Hud.vue";
@@ -121,8 +116,10 @@ import Player from "./Player.vue";
 // Importamos as fases de Boss
 import BossFase1 from "./Boss1.vue";
 import BossFase2 from "./Boss2.vue";
+import AnimatedPoder from "./AnimatedPoder.vue";
 
 const props = defineProps({
+  fase: { type: Number, required: true },
   exibirMenu: { type: Boolean, default: false }, // ← ADICIONADO
   cenario: { type: String, required: true },
   musica: { type: String, required: true },
@@ -155,7 +152,7 @@ const estaAgachado = ref(false);
 const groundedGlob = ref(true);
 
 // Variável que controla em que fase estamos (1 ou 2 neste exemplo)
-const faseAtual = ref(1); // sempre começa no menu
+const faseAtual = computed(() => props.fase); // sempre começa no menu
 const telaAtual = ref(faseAtual.value === 1 ? "menu" : "jogo");
 // Computed para eleger o boss correspondente a cada fase
 const componenteBoss = computed(() => {
@@ -285,13 +282,18 @@ function iniciarJogo() {
   // Inicia loop de jogo (colisões e perguntas)
   frameLoop = requestAnimationFrame(gameLoop);
 
-  // Mostrar moeda bronze após 7s
+  // --- Adicione ou garanta esta lógica aqui para a moeda bronze ---
+  // Limpa qualquer animação de moeda bronze anterior
+  clearInterval(moedaAnimacao);
+  mostrarMoeda.value = false; // Garante que começa oculto para o novo timeout
   setTimeout(() => {
     mostrarMoeda.value = true;
+    moedaFrame.value = 1; // Reseta o frame da moeda
     moedaAnimacao = setInterval(() => {
       moedaFrame.value = moedaFrame.value === 4 ? 1 : moedaFrame.value + 1;
     }, 150);
   }, 7000);
+  // -------------------------------------------------------------
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -299,14 +301,14 @@ function iniciarJogo() {
 // chamamos esta função para animar o “poder” no canvas
 // ──────────────────────────────────────────────────────────────
 
-function startBossPower({ sprite, speed, x, y }) {
+function startBossPower({ frames, speed, x, y }) {
   const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
   const poderY = typeof y === "number" ? y : 300;
 
   console.log("🔥 Poder ajustado:", poderX, poderY);
 
   poderes.value.push({
-    sprite,
+    frames,
     x: poderX,
     y: poderY,
     speed
@@ -544,10 +546,16 @@ function encerrarPergunta(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => { });
+      somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta bronze ---
+      if (bossVida.value > 0) {
+        bossVida.value--; // Reduz a vida do boss em 1
+        console.log("Boss levou 1 de dano pela pergunta bronze! Vida atual:", bossVida.value);
+      }
+      // ---------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => { });
+      somPerda.value.play().catch(() => {});
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -598,10 +606,16 @@ function encerrarPerguntaPrata(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => { });
+      somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta prata ---
+      if (bossVida.value > 0) {
+        bossVida.value-=2; // Reduz a vida do boss em 2
+        console.log("Boss levou 1 de dano pela pergunta prata! Vida atual:", bossVida.value);
+      }
+      // -------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => { });
+      somPerda.value.play().catch(() => {});
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -652,10 +666,16 @@ function encerrarPerguntaDourada(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => { });
+      somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta dourada ---
+      if (bossVida.value > 0) {
+        bossVida.value-=4; // Reduz a vida do boss em 1
+        console.log("Boss levou 1 de dano pela pergunta dourada! Vida atual:", bossVida.value);
+      }
+      // ----------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => { });
+      somPerda.value.play().catch(() => {});
       let perdidas = 0;
       for (let i = 0; i < vidas.length && perdidas < 3; i++) {
         if (vidas[i]) {
@@ -690,15 +710,12 @@ function verificarGameOver() {
 // Emitir Vitória de Fase
 // ──────────────────────────────────────────────────────────────
 const emit = defineEmits(["vencerNivel"]);
+
 function emitirVitoria() {
   emit("vencerNivel");
-  // Ao vencer a fase, você pode incrementar `faseAtual.value++` para mudar o boss:
-  faseAtual.value++;
-
-  telaAtual.value = "intro";
-  clearTimeout(introTimeoutId);
-  exibirIntro();
 }
+
+
 
 // ──────────────────────────────────────────────────────────────
 // Reiniciar Jogo
@@ -851,7 +868,7 @@ watch(telaAtual, (t) => {
 });
 
 onBeforeUnmount(() => {
-  clearTimeout(introTimeout);
+  clearTimeout(introTimeoutId);
   limparJogo();
 });
 
