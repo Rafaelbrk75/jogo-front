@@ -32,9 +32,9 @@ const bossVidaInicial = 8;
 
 // Perguntas
 const perguntas = {
-  bronze: { resposta: "7", imagem: "/fase3/imgPerguntaBronze.png" },
-  prata: { resposta: "8", imagem: "/fase3/perguntaPrata.png" },
-  dourada: { resposta: "x", imagem: "/fase3/perguntaDourada.png" },
+  bronze: { resposta: "b", imagem: "/fase3/imgPerguntaBronze.png" },
+  prata: { resposta: "c", imagem: "/fase3/perguntaPrata.png" },
+  dourada: { resposta: "c", imagem: "/fase3/perguntaDourada.png" },
 };
 // Moedas
 const moedas = {
