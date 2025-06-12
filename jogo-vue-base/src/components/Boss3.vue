@@ -1,11 +1,11 @@
 <template>
   <BossBase
     ref="bossBaseRef"
-    :initialX="bossX"  :initialY="bossY"
+    :initialX="bossX"  
     src1="/fase3/boss.png"
     src2="/fase3/boss2.png"
     attackSrc="/fase3/bossatk.png"
-    attackPrepSrc="/fase3/bossatk2.png"
+    extraClass="boss3-ataque"
     @update:x="onUpdateX"
   />
 </template>
