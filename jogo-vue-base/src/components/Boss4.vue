@@ -7,7 +7,7 @@
     src2="/fase4/boss2.png"
     attackSrc="/fase4/bossatk.png"
     @update:x="onUpdateX"
-    :style="{ position: 'absolute', top: bossY + 'px', left: bossX + 'px' }"
+    :style="{ position: 'absolute', top: bossY - 15 + '%', left: bossX + '%' }"
   />
 </template>
 
@@ -17,8 +17,8 @@ import BossBase from "./BossBase.vue";
 
 const emit = defineEmits(["fire-power", "update:x", "update:y"]);
 
-const bossX = ref(window.innerWidth - 400);
-const bossY = ref(300);
+const bossX = ref(79.8);
+const bossY = ref(30);
 const bossBaseRef = ref(null);
 
 let fireInterval = null;
@@ -31,7 +31,7 @@ function onUpdateX(novaX) {
 function updateBossPosition() {
   const img = bossBaseRef.value?.getBossImg?.()?.value;
   if (img && img.complete) {
-    bossX.value = window.innerWidth - img.offsetWidth - 50;
+    bossX.value = 79.8;
     emit("update:x", bossX.value);
   }
 }
@@ -62,28 +62,35 @@ function startFiring() {
 
     const basePayload = { frames, x: bossX.value, y: bossY.value };
 
+<<<<<<< HEAD
     if (contador % 8 === 0) {
       emit("fire-power", { ...basePayload, speed: 10 });
       emit("fire-power", { ...basePayload, speed: 7 });
       emit("fire-power", { ...basePayload, speed: 12 });
+=======
+    if (contador % 10 === 0) {
+      emit("fire-power", { ...basePayload, speed: 2 });
+      emit("fire-power", { ...basePayload, speed: 4 });
+      emit("fire-power", { ...basePayload, speed: 6 });
+>>>>>>> 4d832843eb93bda247bcc263e8b3935d1c370f20
     } else {
-      emit("fire-power", { ...basePayload, speed: 9 });
+      emit("fire-power", { ...basePayload, speed: 2 });
     }
   }, 1200);
 }
 
 function startTeleporting() {
   console.log("🌀 Boss4 começou a teleportar!");
-  const larguraBoss = 350;
-  const alturaBoss = 350;
-  const margem = 100;
+  const larguraBoss = 3;
+  const alturaBoss = 3;
+  const margem = 5;
 
   const somTeleporte = new Audio("/fase4/teleport.mp3");
   somTeleporte.volume = 1.0;
 
   teleportInterval = setInterval(() => {
-    const novaX = Math.max(50, Math.min(window.innerWidth - larguraBoss - margem, Math.random() * window.innerWidth));
-    const novaY = Math.max(100, Math.min(window.innerHeight - alturaBoss - 200, Math.random() * window.innerHeight));
+    const novaX = Math.max(0, Math.min(100 - larguraBoss - margem, Math.random() * 100));
+    const novaY = Math.max(0, Math.min(100 - alturaBoss - 45, Math.random() * 100));
 
     const img = bossBaseRef.value?.bossImg?.value || bossBaseRef.value?.getBossImg?.().value;
     if (img) {

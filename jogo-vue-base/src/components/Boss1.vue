@@ -2,6 +2,7 @@
   <BossBase
     ref="bossBaseRef"
     :initialX="bossX"
+    :initialY="bossY"
     src1="/fase1/boss.png"
     src2="/fase1/boss2.png"
     attackSrc="/fase1/bossatk.png"
@@ -13,7 +14,8 @@
 import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
 import BossBase from "./BossBase.vue";
 
-const bossX = ref(window.innerWidth - 400); // valor inicial melhor que null
+const bossX = 79.8; // valor inicial melhor que null
+const bossY = 64; // valor inicial do y do boss
 const bossBaseRef = ref(null);
 
 const emit = defineEmits(["fire-power", "update:x"]);
@@ -25,7 +27,7 @@ function onUpdateX(novaX) {
 function updateBossPosition() {
   const img = bossBaseRef.value?.bossImg?.value;
   if (img && img.complete) {
-    bossX.value = window.innerWidth - img.offsetWidth - 50;
+    bossX.value = 79.8;
     emit("update:x", bossX.value); // <-- isso aqui é ESSENCIAL
   }
 }
@@ -41,10 +43,8 @@ function startFiring() {
   fireInterval = setInterval(() => {
     bossBaseRef.value?.triggerAttack();
 
-    const deslocamentoX = 60; // Tente entre 30 e 60
-
-    const posX = bossX.value - deslocamentoX; // Subtrai para jogar o poder pra esquerda do boss
-    const posY = 90; // ou 380, 420, etc.
+    const posX = bossX.value;
+    const posY = bossY + 15;
 
     console.log("🔥 Criando poder em:", posX, posY);
     // Emite o evento de disparo com os parâmetros corretos
@@ -56,7 +56,7 @@ function startFiring() {
     "/fase1/poder-binario3.png",
     "/fase1/poder-binario4.png",
   ],
-  speed: 7,
+  speed: 1,
   x: posX,
   y: posY
     });

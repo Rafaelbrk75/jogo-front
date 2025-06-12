@@ -37,7 +37,7 @@
         @update:x="bossX = $event" @update:y="bossY = $event" @fire-power="startBossPower" @tocarPlayer="levarDano" />
 
       <!-- Sombra do Player -->
-      <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 45 + 'px', bottom: '-50px' }" />
+      <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 1.5 + '%', bottom: '-50px' }" />
 
       <!-- Moedas -->
       <img v-if="mostrarMoeda" :src="moedas.bronze[moedaFrame - 1]" alt="Moeda Girando" class="moeda-girando" />
@@ -47,16 +47,22 @@
 
       <!-- Perguntas -->
       <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
-        <img :src="perguntaBronze.imagem" class="img-pergunta" />
-        <div class="contador">{{ tempoRestAnte }}</div>
+        <div class="pergunta-container">
+          <img :src="perguntaBronze.imagem" class="img-pergunta" />
+          <div class="contador">{{ tempoRestAnte }}</div>
+        </div>
       </div>
       <div v-if="mostrarPerguntaPrata" class="pergunta-overlay" @click.stop>
-        <img :src="perguntaPrata.imagem" class="img-pergunta" />
-        <div class="contador">{{ tempoRestAnte }}</div>
+        <div class="pergunta-container">
+          <img :src="perguntaPrata.imagem" class="img-pergunta" />
+          <div class="contador">{{ tempoRestAnte }}</div>
+        </div>
       </div>
       <div v-if="mostrarPerguntaDourada" class="pergunta-overlay" @click.stop>
-        <img :src="perguntaDourada.imagem" class="img-pergunta" />
-        <div class="contador">{{ tempoRestAnte }}</div>
+        <div class="pergunta-container">
+          <img :src="perguntaDourada.imagem" class="img-pergunta" />
+          <div class="contador">{{ tempoRestAnte }}</div>
+        </div>
       </div>
 
       <!-- Player (envia posição/estado via eventos emitidos) -->
@@ -65,12 +71,19 @@
         @update:estado="onPlayerEstado($event)" />
 
       <!-- Poder (vindo do Boss) -->
-      <AnimatedPoder v-for="(poder, index) in poderes" :key="index" :x="poder.x" :y="poder.y" :frames="poder.frames"
-        :frameDelay="100" :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }" />
+      <AnimatedPoder
+        v-for="(poder, index) in poderes"
+        :key="index"
+        :x="poder.x"
+        :y="poder.y"
+        :frames="poder.frames"
+        :frameDelay="100"
+        :style="{ left: poder.x + '%', top: (poder.y || 5) + '%' }"
+      />
 
       <!-- Tiro de Laser do Player -->
       <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
-        :style="{ left: tiroX + 'px', bottom: tiroY + 'px' }" />
+        :style="{ left: tiroX + '%', bottom: tiroY + '%' }" />
 
       <!-- Áudios -->
       <audio ref="somNivel1" :src="musica" loop />
@@ -149,7 +162,8 @@ const bossY = ref(300);
 let introTimeoutId = null;
 
 const vidas = reactive([true, true, true]);
-const playerX = ref(50);
+
+const playerX = ref(5);
 
 const jumpY = ref(0);
 const direcao = ref("direita");
@@ -165,7 +179,7 @@ const telaAtual = ref(faseAtual.value === 1 ? "menu" : "jogo");
 
 
 // posição X do boss (recebida dos eventos @update:x)
-const bossX = ref(window.innerWidth - 400); // exemplo de valor inicial razoável
+const bossX = ref(79.8); // exemplo de valor inicial razoável
 
 // Tudo relativo ao “poder” do boss
 const poderX = ref(0);
@@ -216,7 +230,7 @@ const perguntaDourada = computed(() => props.perguntas.dourada);
 const tiroVisivel = ref(false);
 const tiroX = ref(0);
 const tiroY = ref(0);
-const tiroSpeed = 30;
+const tiroSpeed = 2.4;
 let tiroAnimFrame = null;
 
 let frameLoop = null;
@@ -285,9 +299,9 @@ function iniciarJogo() {
   vidas.splice(0, vidas.length, true, true, true);
   poderes.value.splice(0, poderes.value.length); // limpa todos os poderes
   poderVisivel.value = false;
-  playerX.value = 50;
+  playerX.value = 5;
   jumpY.value = 0;
-  bossX.value = 1475;
+  bossX.value = 79.8;
   poderX.value = 0;
   poderVisivel.value = false;
   moedaFrame.value = 1;
@@ -329,7 +343,7 @@ function iniciarJogo() {
 
 function startBossPower({ frames, speed, x, y }) {
   console.log("🛫 Recebido poder do boss:", frames, x, y);
-  const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
+  const poderX = (x ?? 74);
   const poderY = typeof y === "number" ? y : bossY.value;
 
   console.log("🔥 Poder ajustado:", poderX, poderY);
@@ -404,9 +418,9 @@ function onKeyUp(_) {
 // ──────────────────────────────────────────────────────────────
 function dispararTiro() {
   if (tiroVisivel.value) return;
-  tiroX.value = playerX.value + 60;
-  tiroY.value = jumpY.value + 40;
-  tiroVisivel.value = true;
+  tiroX.value = playerX.value + 1;
+  tiroY.value = jumpY.value + 3;
+  tiroVisivel.value = true; 
 
   function animarTiro() {
     if (jogoPausado.value || gameOver.value) {
@@ -440,7 +454,7 @@ function dispararTiro() {
       }
     }
 
-    if (tiroX.value > window.innerWidth + 180) {
+    if (tiroX.value > 100) {
       tiroVisivel.value = false;
       cancelAnimationFrame(tiroAnimFrame);
       return;
@@ -761,9 +775,9 @@ function reiniciarJogo() {
   tempoRestAnte.value = 10;
 
   // Reset de posição do player e do boss
-  playerX.value = 50;
+  playerX.value = 5;
   jumpY.value = 0;
-  bossX.value = window.innerWidth - 400;
+  bossX.value = 79.8;
 
   // Reset de controle de jogo
   gameOver.value = false;
@@ -951,15 +965,15 @@ function levarDano() {
 
 .sombra-player {
   position: absolute;
-  bottom: -60px;
-  z-index: 1;
+  bottom: -50px;
+  z-index: 1 ;
   transition: left 0.1s;
 }
 
 .sombra-boss {
   position: absolute;
   bottom: -134px;
-  right: 70px;
+  left: 80%;
   width: 320px;
   height: auto;
   image-rendering: pixelated;
@@ -1013,7 +1027,7 @@ function levarDano() {
 
 .img-game-over {
   width: 100%;
-  max-width: 700px;
+  max-width: 62%;
   image-rendering: pixelated;
   pointer-events: none;
 }
@@ -1050,13 +1064,14 @@ function levarDano() {
 }
 
 .img-pause {
-  max-width: 700px;
+  width: 100%;
+  max-width: 38%;
   image-rendering: pixelated;
   pointer-events: none;
 }
 
 .btn-continuar {
-  margin-top: 100px;
+  margin-top: 1%;
   font-family: "Press Start 2P", monospace;
   font-size: 16px;
   background: limegreen;
@@ -1105,8 +1120,16 @@ function levarDano() {
   z-index: 9998;
 }
 
+.pergunta-container{
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
 .img-pergunta {
-  width: 500px;
+  width: 45%;
   pointer-events: none;
 }
 
@@ -1114,7 +1137,7 @@ function levarDano() {
   font-family: "Press Start 2P", monospace;
   font-size: 28px;
   color: #00ff88;
-  margin-top: 30px;
+  margin-top: 2%;
 }
 
 .intro-hq {
@@ -1129,9 +1152,10 @@ function levarDano() {
 }
 
 .hq-img {
-  max-width: 100%;
-  max-height: 100vh;
+  width: 100%;
+  max-width: 60%;
   image-rendering: pixelated;
+  pointer-events: none;
 }
 
 .btn-skip {

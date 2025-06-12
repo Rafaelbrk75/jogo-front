@@ -3,7 +3,7 @@
     :src="currentSprite"
     alt="Jogador"
     class="player"
-    :style="{ left: x + 'px', bottom: y + 'px' }"
+    :style="{ left: x + '%', bottom: y + '%' }"
   />
 </template>
 
@@ -13,7 +13,7 @@ import { ref, computed, onMounted, onBeforeUnmount, watch } from "vue";
 const emit = defineEmits(["update:x", "update:y", "update:direcao", "update:estado"]);
 
 const props = defineProps({
-  initialX: { type: Number, default: 50 },
+  initialX: { type: Number, default: 10 },
   initialY: { type: Number, default: 0 },
   pausado: { type: Boolean, default: false },
 });
@@ -34,9 +34,9 @@ watch(
   }
 );
 
-const speed = 6;
-const jumpForce = 30;
-const gravity = 0.6;
+const speed = 10;
+const jumpForce = 9;
+const gravity = 0.4;
 let velocityY = 0;
 const somPulo = new Audio("/somPulo.mp3");
 somPulo.volume = 1.0;
@@ -47,7 +47,18 @@ const grounded = ref(true);
 const agachado = ref(false);
 const direcao = ref("direita");
 const moving = { left: false, right: false, down: false };
-const playerX = ref(50);
+const playerX = ref(10);
+const larguraTela = ref(window.innerWidth);
+const alturaTela = ref(window.innerHeight);
+
+function pxToPercentX(px) {
+  return (px / larguraTela.value) * 100;
+}
+
+function percentToPxX(percent) {
+  return (percent / 100) * larguraTela.value;
+}
+
 function atualizarX(novoX) {
   playerX.value = novoX;
 }
@@ -84,8 +95,8 @@ function gameLoop() {
   
   emit("update:x", x.value);
 
-  if (moving.left) x.value = Math.max(0, x.value - speed);
-  if (moving.right) x.value = Math.min(window.innerWidth - 100, x.value + speed);
+  if (moving.left) x.value = Math.max(0, x.value - pxToPercentX(speed));
+  if (moving.right) x.value = Math.min(100, x.value + pxToPercentX(speed));
 
   if (!grounded.value) {
     velocityY -= gravity;
@@ -98,7 +109,7 @@ function gameLoop() {
   }
 
   if (grounded.value) {
-  y.value = agachado.value ? -50 : 0;
+  y.value = agachado.value ? -8 : 0;
 }
 
   emit("update:x", x.value);

@@ -6,7 +6,7 @@
   :src2="spriteAlternado"
   attackSrc="/fase2/bossatk.png"
   @update:x="onUpdateX"
-  :style="{ position: 'absolute', left: bossX + 'px', bottom: '0px' }"
+  :style="{ position: 'absolute', left: bossX + '%', top: '66%' }"
 />
 </template>
 
@@ -17,14 +17,14 @@ import BossBase from "./BossBase.vue";
 const emit = defineEmits(["update:x"]);
 
 const bossBaseRef = ref(null);
-const bossX = ref(0);
+const bossX = ref(79.8);
 
 let direcaoBoss = 1;
 let intervaloBoss = null;
 let bossPodeAndar = false;
 
-const limiteEsquerdo = 20;
-const limiteDireito = window.innerWidth - 250;
+const limiteEsquerdo = 1;
+const limiteDireito = 90;
 
 // Sprites que mudam conforme a direção
 const spriteAtual = ref("/fase2/bossVoltando.png");
@@ -56,7 +56,7 @@ onMounted(() => {
   intervaloBoss = setInterval(() => {
     if (!bossPodeAndar) return;
 
-    bossX.value += direcaoBoss * 10;
+    bossX.value += direcaoBoss;
 
     if (bossX.value <= limiteEsquerdo) {
       // Vai mudar pra direita
