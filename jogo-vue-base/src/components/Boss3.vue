@@ -61,8 +61,9 @@ function startFiring() {
 
     emit("fire-power", {
       frames: [
-    "/fase3/bossatk.png",
-    "/fase3/bossatk2.png",
+    "/fase3/poder-choque.png",
+    "/fase3/poder-choque2.png",
+    "/fase3/poder-choque3.png",
   ],
   speed: 7,
   x: posX,
