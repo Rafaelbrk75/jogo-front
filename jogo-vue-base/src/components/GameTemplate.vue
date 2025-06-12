@@ -29,6 +29,13 @@
         class="sombra sombra-boss"
       />
 
+      <!-- Barra de vida do Boss -->
+      <div class="barra-vida">
+        <div
+          class="barra-vida-fill"
+          :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"
+        ></div>
+      </div>
       <!-- Barra de vida do Boss (com efeito de dano e animação) -->
 <div class="boss-health-wrapper">
   <div class="boss-health-bar">
@@ -43,13 +50,6 @@
   </div>
 </div>
 
-      <!-- Barra de vida do Boss -->
-      <div class="barra-vida">
-        <div
-          class="barra-vida-fill"
-          :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"
-        ></div>
-      </div>
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
       <component
@@ -613,7 +613,7 @@ function iniciarPergunta() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -635,6 +635,12 @@ function encerrarPergunta(acertou) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
       somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta bronze ---
+      if (bossVida.value > 0) {
+        bossVida.value--; // Reduz a vida do boss em 1
+        console.log("Boss levou 1 de dano pela pergunta bronze! Vida atual:", bossVida.value);
+      }
+      // ---------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -667,7 +673,7 @@ function iniciarPerguntaPrata() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -689,6 +695,12 @@ function encerrarPerguntaPrata(acertou) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
       somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta prata ---
+      if (bossVida.value > 0) {
+        bossVida.value-=2; // Reduz a vida do boss em 2
+        console.log("Boss levou 1 de dano pela pergunta prata! Vida atual:", bossVida.value);
+      }
+      // -------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -710,6 +722,7 @@ function encerrarPerguntaPrata(acertou) {
     }, 150);
   }, 4000);
 }
+
 // ──────────────────────────────────────────────────────────────
 // Pergunta Dourada
 // ──────────────────────────────────────────────────────────────
@@ -720,7 +733,7 @@ function iniciarPerguntaDourada() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -742,6 +755,12 @@ function encerrarPerguntaDourada(acertou) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
       somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta dourada ---
+      if (bossVida.value > 0) {
+        bossVida.value-=4; // Reduz a vida do boss em 1
+        console.log("Boss levou 1 de dano pela pergunta dourada! Vida atual:", bossVida.value);
+      }
+      // ----------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
