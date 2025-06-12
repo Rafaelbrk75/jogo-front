@@ -60,13 +60,24 @@ function startFiring() {
 
 function startTeleporting() {
   clearInterval(teleportInterval)
-  const largura = 10, altura = 10, margem = 5
+
+  const larguraBoss = 10 // em porcentagem de largura — ajuste conforme seu layout
+  const alturaBoss  = 10 // idem
+  const margem      = 5  // margem interna
+  const margemTop = 5;
+const margemBottom = 15; // Exemplo: para evitar que vá muito pra baixo
+const margemLeft = 5;
+const margemRight = 5;
+
+
   const sfx = new Audio('/fase4/teleport.mp3')
   teleportInterval = setInterval(() => {
-    const maxX = 100 - largura - margem
-    const maxY = 100 - altura  - margem
-    const newX = Math.random() * maxX + margem
-    const newY = Math.random() * maxY + margem
+    // calcula nova posição dentro dos limites [margem, 100 - larguraBoss - margem]
+    const maxX = 100 - larguraBoss - margemRight;
+const maxY = 100 - alturaBoss - margemBottom; // Usando margemBottom aqui
+
+const newX  = Math.random() * (maxX - margemLeft) + margemLeft; // Ajusta o inicio tbm
+const newY  = Math.random() * (maxY - margemTop) + margemTop;   // Ajusta o inicio tbm
 
     const img = bossBaseRef.value?.getBossImg?.()?.value
     if (img) {

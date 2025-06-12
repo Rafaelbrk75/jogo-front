@@ -426,6 +426,9 @@ function dispararTiro() {
   tiroY.value = jumpY.value + 3;
   tiroVisivel.value = true; 
 
+  setTimeout(() => {
+    tiroVisivel.value = false;
+  }, 500);
   function animarTiro() {
     if (jogoPausado.value || gameOver.value) {
       cancelAnimationFrame(tiroAnimFrame);
