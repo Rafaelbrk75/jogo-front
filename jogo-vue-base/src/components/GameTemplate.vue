@@ -5,36 +5,70 @@
 
     <!-- HQ de Introdução -->
     <div v-else-if="telaAtual === 'intro'" class="intro-hq">
-      <img :key="faseAtual" :src="`/fase${props.fase}/hq-intro.png`" class="hq-img" alt="HQ Intro" />
+      <img
+        :key="faseAtual"
+        :src="`/fase${props.fase}/hq-intro.png`"
+        class="hq-img"
+        alt="HQ Intro"
+      />
       <button class="btn-skip" @click="pularIntro">PULAR</button>
     </div>
 
-
     <!-- Tela de Jogo -->
-    <div v-else-if="telaAtual === 'jogo'" class="cenario" :style="{ backgroundImage: `url('${cenario}')` }">
+    <div
+      v-else-if="telaAtual === 'jogo'"
+      class="cenario"
+      :style="{ backgroundImage: `url('${cenario}')` }"
+    >
       <Hud :vidas="vidas" />
 
       <!-- Sombra do Boss -->
-      <img src="/sombra.png" class="sombra sombra-boss" />
+      <img
+        v-if="props.fase !== 2"
+        src="/sombra.png"
+        class="sombra sombra-boss"
+      />
 
       <!-- Barra de vida do Boss -->
       <div class="barra-vida">
-        <div class="barra-vida-fill" :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"></div>
+        <div
+          class="barra-vida-fill"
+          :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"
+        ></div>
       </div>
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
-      <component :is="bossComponent" :key="faseAtual" class="boss" :initialX="bossX" @update:x="bossX = $event"
-        @fire-power="startBossPower" @tocarPlayer="levarDano" />
-
+      <component
+        :is="bossComponent"
+        :key="faseAtual + '-' + bossKey"
+        class="boss"
+        :initialX="bossX"
+       
+        @update:x="bossX = $event" @update:y="bossY = $event" @fire-power="startBossPower"
+        @tocarPlayer="levarDano"
+      />
 
       <!-- Sombra do Player -->
       <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 4 + '%', bottom: '-50px' }" />
 
       <!-- Moedas -->
-      <img v-if="mostrarMoeda" :src="moedas.bronze[moedaFrame - 1]" alt="Moeda Girando" class="moeda-girando" />
-      <img v-if="mostrarMoedaPrata" :src="moedas.prata[moedaPrataFrame - 1]" alt="Moeda Prata Girando"
-        class="moeda-girando" />
-      <img v-if="mostrarMoedaDourada" :src="moedas.dourada[moedaDouradaFrame - 1]" class="moeda-girando-dourada" />
+      <img
+        v-if="mostrarMoeda"
+        :src="moedas.bronze[moedaFrame - 1]"
+        alt="Moeda Girando"
+        class="moeda-girando"
+      />
+      <img
+        v-if="mostrarMoedaPrata"
+        :src="moedas.prata[moedaPrataFrame - 1]"
+        alt="Moeda Prata Girando"
+        class="moeda-girando"
+      />
+      <img
+        v-if="mostrarMoedaDourada"
+        :src="moedas.dourada[moedaDouradaFrame - 1]"
+        class="moeda-girando-dourada"
+      />
 
       <!-- Perguntas -->
       <div v-if="mostrarPergunta" class="pergunta-overlay" @click.stop>
@@ -57,13 +91,26 @@
       </div>
 
       <!-- Player (envia posição/estado via eventos emitidos) -->
-      <Player :initialX="playerX" :initialY="jumpY" :pausado="jogoPausado || perguntaPausandoJogo"
-        @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
-        @update:estado="onPlayerEstado($event)" />
+      <Player
+        :key="playerKey" :initialX="playerX"
+        :initialY="jumpY"
+        :pausado="jogoPausado || perguntaPausandoJogo"
+        @update:x="playerX = $event"
+        @update:y="jumpY = $event"
+        @update:direcao="direcao = $event"
+        @update:estado="onPlayerEstado($event)"
+      />
 
       <!-- Poder (vindo do Boss) -->
-      <AnimatedPoder v-for="(poder, index) in poderes" :key="index" :x="poder.x" :y="poder.y" :frames="poder.frames"
-        :frame-delay="100" :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }" />
+      <AnimatedPoder
+        v-for="(poder, index) in poderes"
+        :key="index"
+        :x="poder.x"
+        :y="poder.y"
+        :frames="poder.frames"
+        :frameDelay="100"
+        :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }"
+      />
 
       <!-- Tiro de Laser do Player -->
       <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
@@ -82,13 +129,20 @@
 
       <!-- Botão de Som -->
       <button @click.stop="toggleSom" class="btn-som">
-        <img :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'" alt="Som" />
+        <img
+          :src="somAtivo ? '/iconSomLigado.png' : '/iconSomDesligado.png'"
+          alt="Som"
+        />
       </button>
 
       <!-- Overlay de Pause -->
       <div v-if="jogoPausado" class="pause-overlay">
         <img src="/telaPause.png" class="img-pause" alt="Pausado" />
-        <button v-if="jogoPausado" class="btn-continuar" @click.stop="togglePause">
+        <button
+          v-if="jogoPausado"
+          class="btn-continuar"
+          @click.stop="togglePause"
+        >
           CONTINUAR
         </button>
       </div>
@@ -113,7 +167,7 @@ import {
   computed,
   watch,
   onBeforeUnmount,
-  onMounted
+  onMounted,
 } from "vue";
 import Menu from "./Menu.vue";
 import Hud from "./Hud.vue";
@@ -141,7 +195,7 @@ const playerKey = ref(0);
 // Estados principais do GameTemplate
 // ──────────────────────────────────────────────────────────────
 
-
+const bossY = ref(300);
 
 let introTimeoutId = null;
 
@@ -211,7 +265,6 @@ const perguntaBronze = computed(() => props.perguntas.bronze);
 const perguntaPrata = computed(() => props.perguntas.prata);
 const perguntaDourada = computed(() => props.perguntas.dourada);
 
-
 const tiroVisivel = ref(false);
 const tiroX = ref(0);
 const tiroY = ref(0);
@@ -225,6 +278,7 @@ let animacaoDourada = null;
 let timerPergunta = null;
 
 const poderes = ref([]);
+const bossKey = ref(0);
 
 // ──────────────────────────────────────────────────────────────
 // Exibe a HQ antes de iniciar o jogo
@@ -255,7 +309,7 @@ function iniciarJogo() {
   if (somNivel1.value) {
     somNivel1.value.currentTime = 0;
     somNivel1.value.loop = true;
-    somNivel1.value.play().catch(() => { });
+    somNivel1.value.play().catch(() => {});
   }
   somAtivo.value = true;
   gameOver.value = false;
@@ -308,20 +362,19 @@ function iniciarJogo() {
 // ──────────────────────────────────────────────────────────────
 
 function startBossPower({ frames, speed, x, y }) {
+  console.log("🛫 Recebido poder do boss:", frames, x, y);
   const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
-  const poderY = typeof y === "number" ? y : 300;
+  const poderY = typeof y === "number" ? y : bossY.value;
 
   console.log("🔥 Poder ajustado:", poderX, poderY);
 
   poderes.value.push({
-    frames,
+    frames: Array.isArray(frames) ? frames : [frames], // garante array
     x: poderX,
     y: poderY,
-    speed
+    speed,
   });
 }
-
-
 
 // ──────────────────────────────────────────────────────────────
 // Tratamento de teclas para o jogo (pausar, respostas, tiro)
@@ -329,13 +382,11 @@ function startBossPower({ frames, speed, x, y }) {
 
 function onKeyDown(e) {
   if (e.key === "Escape") {
-
     togglePause();
     return;
   }
 
   if (gameOver.value && e.key !== "Escape") return;
-
 
   // Responder pergunta bronze
   if (mostrarPergunta.value && /^[a-zA-Z-Z0-9]$/.test(e.key)) {
@@ -459,7 +510,7 @@ function gameLoop() {
       mostrarMoeda.value = false;
       if (somMoeda.value && somAtivo.value) {
         somMoeda.value.currentTime = 0;
-        somMoeda.value.play().catch(() => { });
+        somMoeda.value.play().catch(() => {});
       }
       iniciarPergunta();
     });
@@ -469,7 +520,7 @@ function gameLoop() {
       mostrarMoedaPrata.value = false;
       if (somMoeda.value && somAtivo.value) {
         somMoeda.value.currentTime = 0;
-        somMoeda.value.play().catch(() => { });
+        somMoeda.value.play().catch(() => {});
       }
       iniciarPerguntaPrata();
     });
@@ -479,7 +530,7 @@ function gameLoop() {
       mostrarMoedaDourada.value = false;
       if (somMoeda.value && somAtivo.value) {
         somMoeda.value.currentTime = 0;
-        somMoeda.value.play().catch(() => { });
+        somMoeda.value.play().catch(() => {});
       }
       iniciarPerguntaDourada();
     });
@@ -531,7 +582,7 @@ function iniciarPergunta() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => { });
+    somRelogio.value.play().catch(() => {});
   }
 
   timerPergunta = setInterval(() => {
@@ -552,10 +603,10 @@ function encerrarPergunta(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => { });
+      somAcerto.value.play().catch(() => {});
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => { });
+      somPerda.value.play().catch(() => {});
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -585,7 +636,7 @@ function iniciarPerguntaPrata() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => { });
+    somRelogio.value.play().catch(() => {});
   }
 
   timerPergunta = setInterval(() => {
@@ -606,10 +657,10 @@ function encerrarPerguntaPrata(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => { });
+      somAcerto.value.play().catch(() => {});
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => { });
+      somPerda.value.play().catch(() => {});
       const idx = vidas.findIndex((v) => v);
       if (idx !== -1) vidas[idx] = false;
       verificarGameOver();
@@ -638,7 +689,7 @@ function iniciarPerguntaDourada() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => { });
+    somRelogio.value.play().catch(() => {});
   }
 
   timerPergunta = setInterval(() => {
@@ -659,10 +710,10 @@ function encerrarPerguntaDourada(acertou) {
   if (somAtivo.value) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => { });
+      somAcerto.value.play().catch(() => {});
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => { });
+      somPerda.value.play().catch(() => {});
       let perdidas = 0;
       for (let i = 0; i < vidas.length && perdidas < 3; i++) {
         if (vidas[i]) {
@@ -686,7 +737,7 @@ function verificarGameOver() {
     if (somNivel1.value) somNivel1.value.pause();
     if (somGameOver.value && somAtivo.value) {
       somGameOver.value.currentTime = 0;
-      somGameOver.value.play().catch(() => { });
+      somGameOver.value.play().catch(() => {});
     }
     window.addEventListener("keydown", onKeyDown);
   }
@@ -701,14 +752,13 @@ function emitirVitoria() {
   emit("vencerNivel");
 }
 
-
-
 // ──────────────────────────────────────────────────────────────
 // Reiniciar Jogo
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
-  limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
+  bossKey.value++;
   playerKey.value++;
+  limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
   // Reset de vidas e estados visuais
   vidas.splice(0, vidas.length, true, true, true);
   poderes.value.splice(0, poderes.value.length);
@@ -748,13 +798,12 @@ function reiniciarJogo() {
   // Música
   if (somNivel1.value && somAtivo.value) {
     somNivel1.value.currentTime = 0;
-    somNivel1.value.play().catch(() => { });
+    somNivel1.value.play().catch(() => {});
   }
 
   // Retorna à tela do jogo (caso esteja vindo do Game Over ou Menu)
   telaAtual.value = "jogo";
 }
-
 
 // ──────────────────────────────────────────────────────────────
 // Limpar estados ao desmontar / mudar fase
@@ -808,14 +857,13 @@ function limparJogo({ manterTeclado = false } = {}) {
   animacaoDourada = null;
 }
 
-
 // ──────────────────────────────────────────────────────────────
 // Liga/Desliga Som
 // ──────────────────────────────────────────────────────────────
 function toggleSom() {
   if (!somNivel1.value) return;
   somAtivo.value = !somAtivo.value;
-  if (somAtivo.value) somNivel1.value.play().catch(() => { });
+  if (somAtivo.value) somNivel1.value.play().catch(() => {});
   else somNivel1.value.pause();
 }
 
@@ -830,7 +878,7 @@ function togglePause() {
     if (frameLoop) cancelAnimationFrame(frameLoop); // Impedir o jogo ficar funcionando quando estiver pausado
   } else {
     if (somAtivo.value && somNivel1.value)
-      somNivel1.value.play().catch(() => { });
+      somNivel1.value.play().catch(() => {});
     if (!perguntaPausandoJogo.value)
       frameLoop = requestAnimationFrame(gameLoop);
   }
@@ -860,7 +908,7 @@ onMounted(() => {
   exibirIntro();
   const tentarTocarSom = () => {
     if (telaAtual.value === "jogo" && somNivel1.value && somAtivo.value) {
-      somNivel1.value.play().catch(() => { });
+      somNivel1.value.play().catch(() => {});
     }
     window.removeEventListener("click", tentarTocarSom);
   };
