@@ -24,7 +24,7 @@
 
       <!-- Sombra do Boss -->
       <img
-        v-if="props.fase !== 2"
+        v-if="props.fase !== 2 && props.fase !== 3 && props.fase !== 4"
         src="/sombra.png"
         class="sombra sombra-boss"
       />

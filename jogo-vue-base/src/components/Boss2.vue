@@ -6,7 +6,7 @@
   :src2="spriteAlternado"
   attackSrc="/fase2/bossatk.png"
   @update:x="onUpdateX"
-  :style="{ position: 'absolute', left: bossX + '%', top: '66%' }"
+  :style="{ position: 'absolute', left: bossX + '%', top: '63%' }"
 />
 </template>
 
