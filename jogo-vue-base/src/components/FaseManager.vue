@@ -9,6 +9,8 @@
         key="fase3" />
     <Game4 v-else-if="faseAtual === 4" :fase="faseAtual" :mostrarMenuInicial="false" @vencerNivel="faseAtual = 5"
         key="fase4" />
+    <Fim v-else-if="faseAtual === 5" :fase="faseAtual" :mostrarMenuInicial="false" key="fim" @voltarMenu="faseAtual = 0" />
+
 </template>
 
 <script setup>
@@ -18,6 +20,7 @@ import Game1 from './Game1.vue'
 import Game2 from './Game2.vue'
 import Game3 from './Game3.vue'
 import Game4 from './Game4.vue'
+import Fim from './Fim.vue'
 
 const faseAtual = ref(0) // começa no menu
 

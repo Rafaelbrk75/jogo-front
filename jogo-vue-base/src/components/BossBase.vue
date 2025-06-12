@@ -5,7 +5,7 @@
   alt="Chefão"
   class="boss"
   :class="extraClass"
-  :style="{ left: initialX + 'px', top: initialY + 'px', position: 'absolute' }"
+  :style="{ left: bossX + 'px', top: initialY + 'px', position: 'absolute' }"
 />
 
 </template>
@@ -79,17 +79,22 @@ function triggerAttack() {
 onMounted(() => {
   bossX.value = props.initialX;
   emit("update:x", bossX.value);
+  
+
   startIdleAnimation();
 });
 
 onBeforeUnmount(() => {
+  console.log("🔧 BossBase montado!", bossImg.value);
   if (idleInterval) clearInterval(idleInterval);
 });
 
 defineExpose({
   bossImg,
-  triggerAttack,
+  getBossImg: () => bossImg,
+  triggerAttack
 });
+
 </script>
 
 <style scoped>
