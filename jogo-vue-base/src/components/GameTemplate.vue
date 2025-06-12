@@ -36,6 +36,20 @@
           :style="{ width: (bossVida / bossVidaInicial) * 100 + '%' }"
         ></div>
       </div>
+      <!-- Barra de vida do Boss (com efeito de dano e animação) -->
+<div class="boss-health-wrapper">
+  <div class="boss-health-bar">
+    <!-- Barra atrasada (efeito de dano) -->
+    <div class="boss-health-damage" :style="{ width: delayedHealthPercent + '%' }"></div>
+
+    <!-- Barra atual -->
+    <div
+      class="boss-health-current"
+      :style="{ width: healthPercent + '%', backgroundColor: barColor }"
+    ></div>
+  </div>
+</div>
+
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
       <component
@@ -260,6 +274,9 @@ const tempoRestAnte = ref(10);
 const perguntaPausandoJogo = ref(false);
 
 const bossVida = ref(props.bossVidaInicial);
+const healthPercent = computed(() => (bossVida.value / props.bossVidaInicial) * 100);
+const delayedHealth = ref(healthPercent.value);
+const delayedHealthPercent = computed(() => delayedHealth.value);
 
 const perguntaBronze = computed(() => props.perguntas.bronze);
 const perguntaPrata = computed(() => props.perguntas.prata);
@@ -280,6 +297,18 @@ let timerPergunta = null;
 const poderes = ref([]);
 const bossKey = ref(0);
 
+watch(healthPercent, (newVal) => {
+  setTimeout(() => {
+    delayedHealth.value = newVal;
+  }, 300); // atraso de 300ms
+});
+
+const barColor = computed(() => {
+  const p = healthPercent.value;
+  if (p > 60) return '#4caf50'; // verde
+  if (p > 30) return '#ff9800'; // laranja
+  return '#f44336';             // vermelho
+});
 // ──────────────────────────────────────────────────────────────
 // Exibe a HQ antes de iniciar o jogo
 // ──────────────────────────────────────────────────────────────
@@ -342,7 +371,6 @@ function iniciarJogo() {
   // Inicia loop de jogo (colisões e perguntas)
   frameLoop = requestAnimationFrame(gameLoop);
 
-  // --- Adicione ou garanta esta lógica aqui para a moeda bronze ---
   // Limpa qualquer animação de moeda bronze anterior
   clearInterval(moedaAnimacao);
   mostrarMoeda.value = false; // Garante que começa oculto para o novo timeout
@@ -582,7 +610,7 @@ function iniciarPergunta() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -604,6 +632,12 @@ function encerrarPergunta(acertou) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
       somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta bronze ---
+      if (bossVida.value > 0) {
+        bossVida.value--; // Reduz a vida do boss em 1
+        console.log("Boss levou 1 de dano pela pergunta bronze! Vida atual:", bossVida.value);
+      }
+      // ---------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -636,7 +670,7 @@ function iniciarPerguntaPrata() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -658,6 +692,12 @@ function encerrarPerguntaPrata(acertou) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
       somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta prata ---
+      if (bossVida.value > 0) {
+        bossVida.value-=2; // Reduz a vida do boss em 2
+        console.log("Boss levou 1 de dano pela pergunta prata! Vida atual:", bossVida.value);
+      }
+      // -------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -679,6 +719,7 @@ function encerrarPerguntaPrata(acertou) {
     }, 150);
   }, 4000);
 }
+
 // ──────────────────────────────────────────────────────────────
 // Pergunta Dourada
 // ──────────────────────────────────────────────────────────────
@@ -689,7 +730,7 @@ function iniciarPerguntaDourada() {
   perguntaPausandoJogo.value = true;
   if (somRelogio.value && somAtivo.value) {
     somRelogio.value.currentTime = 0;
-    somRelogio.value.play().catch(() => {});
+    somRelogio.value.play().catch(() => { });
   }
 
   timerPergunta = setInterval(() => {
@@ -711,6 +752,12 @@ function encerrarPerguntaDourada(acertou) {
     if (acertou && somAcerto.value) {
       somAcerto.value.currentTime = 0;
       somAcerto.value.play().catch(() => {});
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta dourada ---
+      if (bossVida.value > 0) {
+        bossVida.value-=4; // Reduz a vida do boss em 1
+        console.log("Boss levou 1 de dano pela pergunta dourada! Vida atual:", bossVida.value);
+      }
+      // ----------------------------------------------------------------------
     } else if (!acertou && somPerda.value) {
       somPerda.value.currentTime = 0;
       somPerda.value.play().catch(() => {});
@@ -1181,22 +1228,47 @@ function levarDano() {
 }
 
 /* Barra de vida do boss */
-.barra-vida {
+
+
+.boss-health-wrapper {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 200px;
-  height: 20px;
-  background-color: #444;
-  border: 2px solid #222;
-  border-radius: 4px;
-  overflow: hidden;
-  z-index: 10;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 400px;
+  z-index: 20;
+  image-rendering: pixelated;
 }
 
-.barra-vida-fill {
+.boss-health-bar {
+  width: 100%;
+  height: 24px;
+  background-color: #222;
+  border: 2px solid #444;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  image-rendering: pixelated;
+}
+
+.boss-health-damage {
   height: 100%;
-  background-color: #e74c3c;
+  background-color: rgba(255, 255, 255, 0.2);
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: width 0.3s ease;
+  z-index: 1;
+  image-rendering: pixelated;
+}
+
+.boss-health-current {
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
   transition: width 0.2s ease;
+  z-index: 2;
+  image-rendering: pixelated;
 }
 </style>

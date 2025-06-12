@@ -53,7 +53,12 @@ function startFiring() {
 
     contador++;
 
-    const frames = "/fase4/poder_roxo.png";
+    const frames = [
+      "/fase4/poderhugo1.png",
+      "/fase4/poderhugo2.png",
+      "/fase4/poderhugo3.png",
+      "/fase4/poderhugo4.png"
+    ]
 
     const basePayload = { frames, x: bossX.value, y: bossY.value };
 
