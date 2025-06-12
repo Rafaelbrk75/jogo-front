@@ -1,7 +1,7 @@
 <template>
   <img
     :src="currentFrame"
-    :style="{ left: x + 'px', bottom: y + 'px' }"
+    :style="{ left: x + '%', top: y + '%' }"
     class="poder"
   />
 </template>
