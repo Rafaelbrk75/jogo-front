@@ -203,11 +203,11 @@ watch(
 <style scoped>
 .player {
   position: absolute;
-  width: 230px;
+  width: 13vw;
+  height: auto;
+  min-width: 130px;
+  max-height: 230px;
   transition: left 0.1s, bottom 0.1s;
   z-index: 2;
 }
 </style>
-
-
-
