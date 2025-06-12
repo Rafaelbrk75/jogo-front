@@ -53,7 +53,7 @@ function startFiring() {
     bossBaseRef.value?.triggerAttack();
 
     const posX = bossX.value; 
-    const posY = 5;
+    const posY = 80;
 
     console.log("🔥 Criando poder em:", posX, posY);
     // Emite o evento de disparo com os parâmetros corretos
