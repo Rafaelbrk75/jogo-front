@@ -4,6 +4,7 @@
       ref="videoRef"
       src="/video-final.mp4"
       playsinline
+      muted                
       class="video-final"
       @ended="$emit('voltarMenu')"
     />
@@ -14,15 +15,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const videoRef = ref(null);
 const mostrarBotao = ref(true);
 
+onMounted(() => {
+  // ajusta o volume para o máximo assim que o elemento estiver disponível
+  if (videoRef.value) {
+    videoRef.value.volume = 1.0;
+    // tenta iniciar em mudo (para burlar bloqueio de autoplay em mobil)
+    videoRef.value.play().catch(() => {
+      // se falhar (por causa de autoplay), vai esperar o clique
+    });
+  }
+});
+
 function tocarComSom() {
   if (videoRef.value) {
-    videoRef.value.muted = false;
-    videoRef.value.play();
+    videoRef.value.muted = false;  // desmuta
+    videoRef.value.volume = 1.0;   // garante volume máximo
+    // retoma a reprodução caso estivesse pausado
+    videoRef.value.play().catch(() => {});
     mostrarBotao.value = false;
   }
 }

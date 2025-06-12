@@ -65,12 +65,10 @@ function startTeleporting() {
   const alturaBoss  = 10 // idem
   const margem      = 5  // margem interna
   const margemTop = 5;
-const margemBottom = 15; // Exemplo: para evitar que vá muito pra baixo
-const margemLeft = 5;
-const margemRight = 5;
+  const margemBottom = 15; // Exemplo: para evitar que vá muito pra baixo
+  const margemLeft = 5;
+  const margemRight = 5;
 
-
-  const sfx = new Audio('/fase4/teleport.mp3')
   teleportInterval = setInterval(() => {
     // calcula nova posição dentro dos limites [margem, 100 - larguraBoss - margem]
     const maxX = 100 - larguraBoss - margemRight;
