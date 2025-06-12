@@ -425,10 +425,6 @@ function dispararTiro() {
   tiroX.value = playerX.value + 1;
   tiroY.value = jumpY.value + 3;
   tiroVisivel.value = true; 
-  if (faseAtual.value === 4 && bossVida.value <= 0) {
-    // manda o Boss4 parar de atirar/teleportar
-    boss4Ref.value?.stop();
-  }
 
   function animarTiro() {
     if (jogoPausado.value || gameOver.value) {
