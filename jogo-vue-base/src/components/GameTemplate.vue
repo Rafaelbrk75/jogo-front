@@ -702,37 +702,41 @@ function iniciarPerguntaDourada() {
 }
 
 function encerrarPerguntaDourada(acertou) {
-  if (!mostrarPerguntaDourada.value) return;
-  clearInterval(timerPergunta);
-  mostrarPerguntaDourada.value = false;
-  perguntaPausandoJogo.value = false;
-  if (somRelogio.value) somRelogio.value.pause();
+  if (!mostrarPerguntaDourada.value) return;
+  clearInterval(timerPergunta);
+  mostrarPerguntaDourada.value = false;
+  perguntaPausandoJogo.value = false;
+  if (somRelogio.value) somRelogio.value.pause();
 
-  if (somAtivo.value) {
-    if (acertou && somAcerto.value) {
-      somAcerto.value.currentTime = 0;
-      somAcerto.value.play().catch(() => { });
-      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta dourada ---
-      if (bossVida.value > 0) {
-        bossVida.value -= 4; // Reduz a vida do boss em 1
-        console.log("Boss levou 1 de dano pela pergunta dourada! Vida atual:", bossVida.value);
-      }
-      // ----------------------------------------------------------------------
-    } else if (!acertou && somPerda.value) {
-      somPerda.value.currentTime = 0;
-      somPerda.value.play().catch(() => { });
-      let perdidas = 0;
-      for (let i = 0; i < vidas.length && perdidas < 3; i++) {
-        if (vidas[i]) {
-          vidas[i] = false;
-          perdidas++;
-        }
-      }
-      verificarGameOver();
-    }
-  }
+  if (somAtivo.value) {
+    if (acertou && somAcerto.value) {
+      somAcerto.value.currentTime = 0;
+      somAcerto.value.play().catch(() => { });
+      // --- ADIÇÃO: Diminuir a vida do boss ao acertar a pergunta dourada ---
+      // AQUI É A MUDANÇA: APLICA O DANO PRIMEIRO, SEMPRE.
+      bossVida.value -= 4; // Reduz a vida do boss em 4
+      console.log("Boss levou 4 de dano pela pergunta dourada! Vida atual:", bossVida.value); // Log corrigido
 
-  frameLoop = requestAnimationFrame(gameLoop);
+      // AGORA, VERIFICA SE O BOSS MORREU APÓS RECEBER O DANO.
+      if (bossVida.value <= 0) {
+        emitirVitoria();
+      }
+      // ----------------------------------------------------------------------
+    } else if (!acertou && somPerda.value) {
+      somPerda.value.currentTime = 0;
+      somPerda.value.play().catch(() => { });
+      let perdidas = 0;
+      for (let i = 0; i < vidas.length && perdidas < 3; i++) {
+        if (vidas[i]) {
+          vidas[i] = false;
+          perdidas++;
+        }
+      }
+      verificarGameOver();
+    }
+  }
+
+  frameLoop = requestAnimationFrame(gameLoop);
 }
 // ──────────────────────────────────────────────────────────────
 // Verifica Game Over
