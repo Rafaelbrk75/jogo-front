@@ -82,6 +82,9 @@ Mesmo com os desafios, entregamos um jogo funcional, original e com identidade p
 - **Fernando Queiroz**  
   GitHub: [ferqueiroz](https://github.com/ferqueiroz)
 
+- **Kauan Marcolino Garcia**
+  GitHub: [Kauanmarcolino](https://github.com/Kauanmarcolino)
+  
 - **Pedro H. G. Cavalini**  
   GitHub: [PedroCavalini](https://github.com/PedroCavalini)
 
