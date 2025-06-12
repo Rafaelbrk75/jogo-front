@@ -14,7 +14,15 @@
       <Hud :vidas="vidas" />
 
       <!-- Sombra do Boss -->
+<<<<<<< HEAD
       <img v-if="props.fase !== 2" src="/sombra.png" class="sombra sombra-boss" />
+=======
+      <img
+        v-if="props.fase !== 2 && props.fase !== 3 && props.fase !== 4"
+        src="/sombra.png"
+        class="sombra sombra-boss"
+      />
+>>>>>>> a5f601d8490f4d75c62dd7da19aeb4524a27eed8
 
       <!-- Barra de vida do Boss -->
       <div class="barra-vida">

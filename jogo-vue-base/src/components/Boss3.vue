@@ -2,7 +2,7 @@
   <BossBase
     ref="bossBaseRef"
     :initialX="bossX"  
-    :initialY="68"
+    :initialY="63"
     src1="/fase3/boss.png"
     src2="/fase3/boss2.png"
     attackSrc="/fase3/bossatk.png"

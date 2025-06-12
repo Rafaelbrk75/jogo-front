@@ -7,145 +7,148 @@
     src2="/fase4/boss2.png"
     attackSrc="/fase4/bossatk.png"
     @update:x="onUpdateX"
-    :style="{ position: 'absolute', top: bossY - 15 + '%', left: bossX + '%' }"
+    @update:y="onUpdateY"
+    :class="['boss', 'boss4']"
+    :style="{ top: bossY + '%', left: bossX + '%' }"
   />
 </template>
 
 <script setup>
-import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
-import BossBase from "./BossBase.vue";
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import BossBase from './BossBase.vue'
 
-const emit = defineEmits(["fire-power", "update:x", "update:y"]);
+const emit = defineEmits(['fire-power', 'update:x', 'update:y'])
 
-const bossX = ref(79.8);
-const bossY = ref(30);
-const bossBaseRef = ref(null);
+// estado reativo da posição
+const bossX = ref(79.8)
+const bossY = ref(30)
 
-let fireInterval = null;
-let teleportInterval = null;
+// referência ao componente BossBase
+const bossBaseRef = ref(null)
 
-function onUpdateX(novaX) {
-  emit("update:x", novaX);
+// identificadores de intervalo
+let fireInterval = null
+let teleportInterval = null
+
+// repassa para fora quando o BossBase emite @update:x
+function onUpdateX(x) {
+  bossX.value = x
+  emit('update:x', x)
+}
+function onUpdateY(y) {
+  bossY.value = y
+  emit('update:y', y)
 }
 
-function updateBossPosition() {
-  const img = bossBaseRef.value?.getBossImg?.()?.value;
-  if (img && img.complete) {
-    bossX.value = 79.8;
-    emit("update:x", bossX.value);
-  }
-}
-
-function handleImgLoad() {
-  console.log("📦 Boss4 imagem carregada!");
-  updateBossPosition();
-  startFiring();
-  startTeleporting();
-}
-
+// dispara os poderes periodicamente
 function startFiring() {
-  let contador = 0;
-  if (fireInterval) clearInterval(fireInterval);
+  let contador = 0
+  clearInterval(fireInterval)
 
   fireInterval = setInterval(() => {
-    bossBaseRef.value?.triggerAttack();
-    console.log("🔥 Disparo Boss 4 em x =", bossX.value);
-
-    contador++;
-
-    const frames = [
-      "/fase4/poderhugo1.png",
-      "/fase4/poderhugo2.png",
-      "/fase4/poderhugo3.png",
-      "/fase4/poderhugo4.png"
-    ]
-
-    const basePayload = { frames, x: bossX.value, y: bossY.value };
-
-<<<<<<< HEAD
-    if (contador % 8 === 0) {
-      emit("fire-power", { ...basePayload, speed: 10 });
-      emit("fire-power", { ...basePayload, speed: 7 });
-      emit("fire-power", { ...basePayload, speed: 12 });
-=======
-    if (contador % 10 === 0) {
-      emit("fire-power", { ...basePayload, speed: 2 });
-      emit("fire-power", { ...basePayload, speed: 4 });
-      emit("fire-power", { ...basePayload, speed: 6 });
->>>>>>> 4d832843eb93bda247bcc263e8b3935d1c370f20
-    } else {
-      emit("fire-power", { ...basePayload, speed: 2 });
+    // dispara animação interna do BossBase
+    const base = bossBaseRef.value
+    if (base && typeof base.triggerAttack === 'function') {
+      base.triggerAttack()
     }
-  }, 1200);
+
+    // prepara payload
+    const frames = [
+      '/fase4/poderhugo1.png',
+      '/fase4/poderhugo2.png',
+      '/fase4/poderhugo3.png',
+      '/fase4/poderhugo4.png'
+    ]
+    const payloadBase = { frames, x: bossX.value, y: bossY.value }
+
+    // a cada 8 ciclos dispara em três velocidades
+    if (contador % 8 === 0) {
+      emit('fire-power', { ...payloadBase, speed: 10 })
+      emit('fire-power', { ...payloadBase, speed: 7  })
+      emit('fire-power', { ...payloadBase, speed: 12 })
+    } else {
+      emit('fire-power', { ...payloadBase, speed: 2 })
+    }
+
+    contador++
+  }, 1200)
 }
 
+// teleporta o boss para uma posição aleatória na tela
 function startTeleporting() {
-  console.log("🌀 Boss4 começou a teleportar!");
-  const larguraBoss = 3;
-  const alturaBoss = 3;
-  const margem = 5;
+  clearInterval(teleportInterval)
 
-  const somTeleporte = new Audio("/fase4/teleport.mp3");
-  somTeleporte.volume = 1.0;
+  const larguraBoss = 10 // em porcentagem de largura — ajuste conforme seu layout
+  const alturaBoss  = 10 // idem
+  const margem      = 5  // margem interna
+
+  const sfx = new Audio('/fase4/teleport.mp3')
+  sfx.volume = 1.0
 
   teleportInterval = setInterval(() => {
-    const novaX = Math.max(0, Math.min(100 - larguraBoss - margem, Math.random() * 100));
-    const novaY = Math.max(0, Math.min(100 - alturaBoss - 45, Math.random() * 100));
+    // calcula nova posição dentro dos limites [margem, 100 - larguraBoss - margem]
+    const maxX = 100 - larguraBoss - margem
+    const maxY = 100 - alturaBoss - margem
+    const newX  = Math.random() * maxX + margem
+    const newY  = Math.random() * maxY + margem
 
-    const img = bossBaseRef.value?.bossImg?.value || bossBaseRef.value?.getBossImg?.().value;
+    // faz fade-out/fade-in no próprio <img> interno do BossBase
+    const img = bossBaseRef.value?.getBossImg?.()?.value
     if (img) {
-      img.style.opacity = 0;
+      img.style.transition = 'opacity 0.3s'
+      img.style.opacity = '0'
       setTimeout(() => {
-        bossX.value = novaX;
-        bossY.value = novaY;
-        emit("update:x", bossX.value);
-        emit("update:y", bossY.value);
-        img.style.opacity = 1;
-      }, 300);
+        bossX.value = newX
+        bossY.value = newY
+        emit('update:x', newX)
+        emit('update:y', newY)
+        img.style.opacity = '1'
+      }, 300)
     } else {
-      bossX.value = novaX;
-      bossY.value = novaY;
-      emit("update:x", bossX.value);
-      emit("update:y", bossY.value);
+      bossX.value = newX
+      bossY.value = newY
+      emit('update:x', newX)
+      emit('update:y', newY)
     }
 
-    somTeleporte.currentTime = 0;
-    somTeleporte.play().catch(() => {});
-    console.log("🌀 Teleportando boss para:", novaX, novaY);
-  }, 3000);
+    // toca efeito sonoro de teleporte
+    sfx.currentTime = 0
+    sfx.play().catch(()=>{})
+
+  }, 3000)
 }
 
 onMounted(async () => {
-  await nextTick();
+  // garante que o template esteja renderizado
+  await nextTick()
 
-  setTimeout(() => {
-  const imgRef = bossBaseRef.value?.getBossImg?.();
-  const img = imgRef?.value;
-
-  if (img) {
-    console.log("✅ Imagem do boss encontrada:", img);
-    if (img.complete) {
-      handleImgLoad();
+  // sempre rode após o BossBase carregar sua imagem
+  const bossImgRef = bossBaseRef.value?.getBossImg?.()?.value
+  if (bossImgRef) {
+    if (bossImgRef.complete) {
+      startFiring()
+      startTeleporting()
     } else {
-      img.addEventListener("load", handleImgLoad);
+      bossImgRef.addEventListener('load', () => {
+        startFiring()
+        startTeleporting()
+      })
     }
+  } else {
+    // fallback: inicia mesmo sem aguardar load
+    startFiring()
+    startTeleporting()
   }
-}, 100);
-
-});
+})
 
 onBeforeUnmount(() => {
-  window.removeEventListener("resize", updateBossPosition);
-  const img = bossBaseRef.value?.bossImg?.value || bossBaseRef.value?.getBossImg?.().value;
-  if (img) img.removeEventListener("load", handleImgLoad);
-  clearInterval(fireInterval);
-  clearInterval(teleportInterval);
-});
-
+  clearInterval(fireInterval)
+  clearInterval(teleportInterval)
+})
 </script>
 
 <style scoped>
-.boss.boss4 {
+.boss4 {
   position: absolute !important;
 }
 </style>
