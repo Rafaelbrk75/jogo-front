@@ -17,6 +17,8 @@ const props = defineProps({
   initialY: { type: Number, default: 0 },
   src1: { type: String, required: true },
   src2: { type: String, required: true },
+  src3: { type: String, required: true },
+  src4: { type: String, required: true },
   attackSrc: { type: String, required: true },
 });
 

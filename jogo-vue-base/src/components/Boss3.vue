@@ -1,9 +1,11 @@
 <template>
   <BossBase
     ref="bossBaseRef"
-    :initialX="bossX"  :initialY="bossY"  src1="/fase3/boss.png"
+    :initialX="bossX"  :initialY="bossY"
+    src1="/fase3/boss.png"
     src2="/fase3/boss2.png"
     attackSrc="/fase3/bossatk.png"
+    attackPrepSrc="/fase3/bossatk2.png"
     @update:x="onUpdateX"
   />
 </template>
@@ -58,10 +60,13 @@ function startFiring() {
     // Emite o evento de disparo com os parâmetros corretos
 
     emit("fire-power", {
-      sprite: "/fase1/poder-binario.png",
-      speed: 7,
-      x: posX,
-      y: posY,
+      frames: [
+    "/fase3/bossatk.png",
+    "/fase3/bossatk2.png",
+  ],
+  speed: 7,
+  x: posX,
+  y: posY
     });
   }, 2000);
 }
