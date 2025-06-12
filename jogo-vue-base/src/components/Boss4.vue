@@ -1,28 +1,35 @@
 <template>
-  <!-- Usa BossBase apenas para trocar o sprite -->
-  <BossBase ref="bossBaseRef" :initialX="bossX" src1="/fase4/boss.png" src2="/fase4/boss2.png"
-    attackSrc="/fase4/bossatk.png" @update:x="onUpdateX"
-    :style="{ top: bossY + 'px', left: bossX + 'px', position: 'absolute' }" />
-
+  <BossBase
+    ref="bossBaseRef"
+    :initialX="bossX"
+    :initialY="bossY"
+    src1="/fase4/boss.png"
+    src2="/fase4/boss2.png"
+    attackSrc="/fase4/bossatk.png"
+    @update:x="onUpdateX"
+    :style="{ position: 'absolute', top: bossY + 'px', left: bossX + 'px' }"
+  />
 </template>
 
 <script setup>
 import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
 import BossBase from "./BossBase.vue";
 
-const bossX = ref(window.innerWidth - 400); // valor inicial
+const emit = defineEmits(["fire-power", "update:x", "update:y"]);
+
+const bossX = ref(window.innerWidth - 400);
+const bossY = ref(300);
 const bossBaseRef = ref(null);
-const emit = defineEmits(["fire-power", "update:x"]);
-const bossY = ref(300); // altura inicial personalizada
 
-
+let fireInterval = null;
+let teleportInterval = null;
 
 function onUpdateX(novaX) {
   emit("update:x", novaX);
 }
 
 function updateBossPosition() {
-  const img = bossBaseRef.value?.bossImg?.value;
+  const img = bossBaseRef.value?.getBossImg?.()?.value;
   if (img && img.complete) {
     bossX.value = window.innerWidth - img.offsetWidth - 50;
     emit("update:x", bossX.value);
@@ -30,109 +37,99 @@ function updateBossPosition() {
 }
 
 function handleImgLoad() {
+  console.log("📦 Boss4 imagem carregada!");
   updateBossPosition();
   startFiring();
-  startTeleporting(); // ✅ Isso agora está certo
+  startTeleporting();
 }
-
-
-let fireInterval = null;
 
 function startFiring() {
   let contador = 0;
-  if (gameOver.value) return;
-  if (fireInterval) clearInterval(fireInterval); // Limpa o intervalo anterior
-  bossBaseRef.value?.triggerAttack(); // Garante que o ataque inicial seja disparado
+  if (fireInterval) clearInterval(fireInterval);
+
   fireInterval = setInterval(() => {
     bossBaseRef.value?.triggerAttack();
     console.log("🔥 Disparo Boss 4 em x =", bossX.value);
 
     contador++;
-    if (contador % 3 === 0) {
-      // 🔥 Rajada difícil
-      emit("fire-power", {
-        sprite: "/fase4/poder-binario.png",
-        speed: 10,
-        x: bossX.value,
-        y: bossY.value
-      });
-      emit("fire-power", {
-        sprite: "/fase4/poder-binario.png",
-        speed: 7,
-        x: bossX.value,
-        y: bossY.value
-      });
-      emit("fire-power", {
-        sprite: "/fase4/poder-binario.png",
-        speed: 12,
-        x: bossX.value,
-        y: bossY.value
-      });
+
+    const frames = "/fase4/poder_roxo.png";
+
+    const basePayload = { frames, x: bossX.value, y: bossY.value };
+
+    if (contador % 10 === 0) {
+      emit("fire-power", { ...basePayload, speed: 10 });
+      emit("fire-power", { ...basePayload, speed: 7 });
+      emit("fire-power", { ...basePayload, speed: 12 });
     } else {
-      // 🔥 Tiro simples
-      emit("fire-power", {
-        sprite: "/fase4/poder-binario.png",
-        speed: 9,
-        x: bossX.value,
-        y: bossY.value
-      });
+      emit("fire-power", { ...basePayload, speed: 9 });
     }
-  }, 1200); // mais rápido
+  }, 1200);
 }
 
 function startTeleporting() {
-  const larguraBoss = 350; // ajuste conforme necessário
+  console.log("🌀 Boss4 começou a teleportar!");
+  const larguraBoss = 350;
   const alturaBoss = 350;
   const margem = 100;
 
-  const somTeleporte = new Audio("/fase4/teleport.mp3"); // 🔊 som do teleporte
+  const somTeleporte = new Audio("/fase4/teleport.mp3");
   somTeleporte.volume = 1.0;
 
-  setInterval(() => {
-    const novaX = Math.max(
-      50,
-      Math.min(window.innerWidth - larguraBoss - margem, Math.random() * window.innerWidth)
-    );
+  teleportInterval = setInterval(() => {
+    const novaX = Math.max(50, Math.min(window.innerWidth - larguraBoss - margem, Math.random() * window.innerWidth));
+    const novaY = Math.max(100, Math.min(window.innerHeight - alturaBoss - 200, Math.random() * window.innerHeight));
 
-    const novaY = Math.max(
-      100,
-      Math.min(window.innerHeight - alturaBoss - 200, Math.random() * window.innerHeight)
-    );
-
-    bossX.value = novaX;
-    bossY.value = novaY;
-    emit("update:x", bossX.value);
+    const img = bossBaseRef.value?.bossImg?.value || bossBaseRef.value?.getBossImg?.().value;
+    if (img) {
+      img.style.opacity = 0;
+      setTimeout(() => {
+        bossX.value = novaX;
+        bossY.value = novaY;
+        emit("update:x", bossX.value);
+        emit("update:y", bossY.value);
+        img.style.opacity = 1;
+      }, 300);
+    } else {
+      bossX.value = novaX;
+      bossY.value = novaY;
+      emit("update:x", bossX.value);
+      emit("update:y", bossY.value);
+    }
 
     somTeleporte.currentTime = 0;
-    somTeleporte.play().catch(() => { });
-
+    somTeleporte.play().catch(() => {});
     console.log("🌀 Teleportando boss para:", novaX, novaY);
   }, 3000);
 }
 
 onMounted(async () => {
   await nextTick();
-  const img = bossBaseRef.value?.bossImg?.value;
+
+  setTimeout(() => {
+  const imgRef = bossBaseRef.value?.getBossImg?.();
+  const img = imgRef?.value;
 
   if (img) {
-    img.addEventListener("load", handleImgLoad);
-
-    // ✅ Garante chamada mesmo se já tiver carregado
+    console.log("✅ Imagem do boss encontrada:", img);
     if (img.complete) {
       handleImgLoad();
+    } else {
+      img.addEventListener("load", handleImgLoad);
     }
   }
+}, 100);
 
-  window.addEventListener("resize", updateBossPosition);
 });
-
 
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateBossPosition);
-  const img = bossBaseRef.value?.bossImg?.value;
+  const img = bossBaseRef.value?.bossImg?.value || bossBaseRef.value?.getBossImg?.().value;
   if (img) img.removeEventListener("load", handleImgLoad);
-  if (fireInterval) clearInterval(fireInterval);
+  clearInterval(fireInterval);
+  clearInterval(teleportInterval);
 });
+
 </script>
 
 <style scoped>

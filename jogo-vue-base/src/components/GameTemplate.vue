@@ -40,11 +40,11 @@
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
       <component
         :is="bossComponent"
-        :key="faseAtual"
+        :key="faseAtual + '-' + bossKey"
         class="boss"
         :initialX="bossX"
-        @update:x="bossX = $event"
-        @fire-power="startBossPower"
+       
+        @update:x="bossX = $event" @update:y="bossY = $event" @fire-power="startBossPower"
         @tocarPlayer="levarDano"
       />
 
@@ -90,7 +90,7 @@
 
       <!-- Player (envia posição/estado via eventos emitidos) -->
       <Player
-        :initialX="playerX"
+        :key="playerKey" :initialX="playerX"
         :initialY="jumpY"
         :pausado="jogoPausado || perguntaPausandoJogo"
         @update:x="playerX = $event"
@@ -106,7 +106,7 @@
         :x="poder.x"
         :y="poder.y"
         :frames="poder.frames"
-        :frame-delay="100"
+        :frameDelay="100"
         :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }"
       />
 
@@ -198,6 +198,8 @@ const playerKey = ref(0);
 // Estados principais do GameTemplate
 // ──────────────────────────────────────────────────────────────
 
+const bossY = ref(300);
+
 let introTimeoutId = null;
 
 const vidas = reactive([true, true, true]);
@@ -279,6 +281,7 @@ let animacaoDourada = null;
 let timerPergunta = null;
 
 const poderes = ref([]);
+const bossKey = ref(0);
 
 // ──────────────────────────────────────────────────────────────
 // Exibe a HQ antes de iniciar o jogo
@@ -362,13 +365,14 @@ function iniciarJogo() {
 // ──────────────────────────────────────────────────────────────
 
 function startBossPower({ frames, speed, x, y }) {
+  console.log("🛫 Recebido poder do boss:", frames, x, y);
   const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
-  const poderY = typeof y === "number" ? y : 300;
+  const poderY = typeof y === "number" ? y : bossY.value;
 
   console.log("🔥 Poder ajustado:", poderX, poderY);
 
   poderes.value.push({
-    frames,
+    frames: Array.isArray(frames) ? frames : [frames], // garante array
     x: poderX,
     y: poderY,
     speed,
@@ -755,8 +759,9 @@ function emitirVitoria() {
 // Reiniciar Jogo
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
-  limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
+  bossKey.value++;
   playerKey.value++;
+  limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
   // Reset de vidas e estados visuais
   vidas.splice(0, vidas.length, true, true, true);
   poderes.value.splice(0, poderes.value.length);
