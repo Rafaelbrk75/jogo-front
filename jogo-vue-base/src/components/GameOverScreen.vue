@@ -30,13 +30,15 @@ defineEmits(['restart']);
 }
 
 .img-game-over {
-    max-width: 700px;
+    width: 100%;
+    max-width: 62%;
     image-rendering: pixelated;
     pointer-events: none;
 }
 
 .btn-reiniciar {
-    margin-top: 20px;
+    position: absolute;
+    bottom: 38.8%;
     font-family: 'Press Start 2P', monospace;
     font-size: 16px;
     background: red;
