@@ -49,7 +49,7 @@
       />
 
       <!-- Sombra do Player -->
-      <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 4 + '%', bottom: '-50px' }" />
+      <img src="/sombra.png" class="sombra sombra-player" :style="{ left: playerX + 1.5 + '%', bottom: '-50px' }" />
 
       <!-- Moedas -->
       <img
@@ -109,7 +109,7 @@
         :y="poder.y"
         :frames="poder.frames"
         :frameDelay="100"
-        :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }"
+        :style="{ left: poder.x + '%', top: (poder.y || 5) + '%' }"
       />
 
       <!-- Tiro de Laser do Player -->
@@ -220,7 +220,7 @@ const componenteBoss = computed(() => {
 });
 
 // posição X do boss (recebida dos eventos @update:x)
-const bossX = ref(window.innerWidth - 400); // exemplo de valor inicial razoável
+const bossX = ref(79.8); // exemplo de valor inicial razoável
 
 // Tudo relativo ao “poder” do boss
 const poderX = ref(0);
@@ -320,7 +320,7 @@ function iniciarJogo() {
   poderVisivel.value = false;
   playerX.value = 5;
   jumpY.value = 0;
-  bossX.value = 1475;
+  bossX.value = 79.8;
   poderX.value = 0;
   poderVisivel.value = false;
   moedaFrame.value = 1;
@@ -363,7 +363,7 @@ function iniciarJogo() {
 
 function startBossPower({ frames, speed, x, y }) {
   console.log("🛫 Recebido poder do boss:", frames, x, y);
-  const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
+  const poderX = (x ?? 74);
   const poderY = typeof y === "number" ? y : bossY.value;
 
   console.log("🔥 Poder ajustado:", poderX, poderY);
@@ -777,7 +777,7 @@ function reiniciarJogo() {
   // Reset de posição do player e do boss
   playerX.value = 5;
   jumpY.value = 0;
-  bossX.value = window.innerWidth - 400;
+  bossX.value = 79.8;
 
   // Reset de controle de jogo
   gameOver.value = false;
@@ -973,7 +973,7 @@ function levarDano() {
 .sombra-boss {
   position: absolute;
   bottom: -134px;
-  right: 70px;
+  left: 80%;
   width: 320px;
   height: auto;
   image-rendering: pixelated;

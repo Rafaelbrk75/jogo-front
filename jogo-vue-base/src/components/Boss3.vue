@@ -2,6 +2,7 @@
   <BossBase
     ref="bossBaseRef"
     :initialX="bossX"  
+    :initialY="68"
     src1="/fase3/boss.png"
     src2="/fase3/boss2.png"
     attackSrc="/fase3/bossatk.png"
@@ -18,7 +19,7 @@ import BossBase from "./BossBase.vue";
 // E que o CSS do BossBase use `top: initialY + 'px'`
 // para posicionar a imagem verticalmente.
 
-const bossX = ref(window.innerWidth - 400);
+const bossX = ref(79.8);
 const bossY = ref(300); // Adicione esta linha para controlar a altura do boss
 const bossBaseRef = ref(null);
 
@@ -35,7 +36,7 @@ function updateBossPosition() {
   const img = bossBaseRef.value?.bossImg?.value;
   if (img && img.complete) {
     // Isso ajusta a posição X para que o boss não fique cortado na direita
-    bossX.value = window.innerWidth - img.offsetWidth - 50;
+    bossX.value = 79.8;
     // Removido: emit("update:x", bossX.value); aqui para evitar loop desnecessário
     // se Boss3 já está controlando bossX
   }
@@ -51,17 +52,15 @@ function startFiring() {
   fireInterval = setInterval(() => {
     bossBaseRef.value?.triggerAttack();
 
-    const deslocamentoX = 60; // Tente entre 30 e 60
-
-    const posX = bossX.value - deslocamentoX; // Subtrai para jogar o poder pra esquerda do boss
-    const posY = 90; // ou 380, 420, etc.
+    const posX = bossX.value; 
+    const posY = 5;
 
     console.log("🔥 Criando poder em:", posX, posY);
     // Emite o evento de disparo com os parâmetros corretos
 
     emit("fire-power", {
       sprite: "/fase1/poder-binario.png",
-      speed: 7,
+      speed: 1,
       x: posX,
       y: posY,
     });

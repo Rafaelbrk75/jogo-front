@@ -5,7 +5,7 @@
   alt="Chefão"
   class="boss"
   :class="extraClass"
-  :style="{ left: bossX + 'px', top: initialY + 'px', position: 'absolute' }"
+  :style="{ left: bossX + '%', top: initialY + '%', position: 'absolute' }"
 />
 
 </template>
@@ -14,7 +14,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 
 const props = defineProps({
-  initialX: { type: Number, default: 1000 },
+  initialX: { type: Number, default: 79.8 },
   initialY: { type: Number, default: 0 },
   src1: { type: String, required: true },
   src2: { type: String, required: true },
@@ -102,8 +102,8 @@ defineExpose({
   position: absolute;
   bottom: 0px;
   width: 18vw;
-  min-width: 350px;
-  max-width: 600px;
+  min-width: 20%;
+  max-width: 40%;
   transition: left 0.2s;
   z-index: 2;
   image-rendering: pixelated;
