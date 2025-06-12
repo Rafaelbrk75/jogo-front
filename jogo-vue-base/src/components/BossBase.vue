@@ -4,7 +4,7 @@
   :src="currentSprite"
   alt="Chefão"
   class="boss"
-  :style="{ left: initialX + 'px', position: 'absolute' }"
+  :style="{ left: bossX + 'px', position: 'absolute' }"
 />
 
 </template>
@@ -59,17 +59,22 @@ function triggerAttack() {
 onMounted(() => {
   bossX.value = props.initialX;
   emit("update:x", bossX.value);
+  
+
   startIdleAnimation();
 });
 
 onBeforeUnmount(() => {
+  console.log("🔧 BossBase montado!", bossImg.value);
   if (idleInterval) clearInterval(idleInterval);
 });
 
 defineExpose({
   bossImg,
-  triggerAttack,
+  getBossImg: () => bossImg,
+  triggerAttack
 });
+
 </script>
 
 <style scoped>

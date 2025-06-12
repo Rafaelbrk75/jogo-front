@@ -2,11 +2,11 @@
   <BossBase
   ref="bossBaseRef"
   class="boss"
-  :x="bossX"
   :src1="spriteAtual"
   :src2="spriteAlternado"
   attackSrc="/fase2/bossatk.png"
   @update:x="onUpdateX"
+  :style="{ position: 'absolute', left: bossX + 'px', bottom: '0px' }"
 />
 </template>
 
