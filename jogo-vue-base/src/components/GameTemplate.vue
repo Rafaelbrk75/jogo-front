@@ -37,7 +37,7 @@
 
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
-      <component :is="bossComponent" :key="faseAtual + '-' + bossKey" class="boss" :initialX="bossX"
+      <component :is="bossComponent" :key="faseAtual + '-' + bossKey" class="boss boss4" :initialX="bossX"
         @update:x="bossX = $event" @update:y="bossY = $event" @fire-power="startBossPower" @tocarPlayer="levarDano" />
 
       <!-- Sombra do Player -->
@@ -139,9 +139,8 @@ import Menu from "./Menu.vue";
 import Hud from "./Hud.vue";
 import Player from "./Player.vue";
 
+
 // Importamos as fases de Boss
-import BossFase1 from "./Boss1.vue";
-import BossFase2 from "./Boss2.vue";
 import AnimatedPoder from "./AnimatedPoder.vue";
 
 const props = defineProps({
@@ -222,6 +221,7 @@ const respostaDigitada = ref("");
 const tempoRestAnte = ref(10);
 const perguntaPausandoJogo = ref(false);
 
+const boss4Ref = ref(null);
 const bossVida = ref(props.bossVidaInicial);
 const healthPercent = computed(() => (bossVida.value / props.bossVidaInicial) * 100);
 const delayedHealth = ref(healthPercent.value);
@@ -425,6 +425,10 @@ function dispararTiro() {
   tiroX.value = playerX.value + 1;
   tiroY.value = jumpY.value + 3;
   tiroVisivel.value = true; 
+  if (faseAtual.value === 4 && bossVida.value <= 0) {
+    // manda o Boss4 parar de atirar/teleportar
+    boss4Ref.value?.stop();
+  }
 
   function animarTiro() {
     if (jogoPausado.value || gameOver.value) {
@@ -760,6 +764,7 @@ function emitirVitoria() {
 // Reiniciar Jogo
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
+  iniciarJogo();
   bossKey.value++;
   playerKey.value++;
   limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
