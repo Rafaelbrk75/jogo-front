@@ -33,8 +33,8 @@
 
 
       <!-- Aqui carregamos o boss correto, de acordo com faseAtual -->
-      <component :is="bossComponent" :key="faseAtual" class="boss" :initialX="bossX" @update:x="bossX = $event"
-        @fire-power="startBossPower" @tocarPlayer="levarDano" />
+      <component :is="bossComponent" :key="faseAtual + '-' + bossKey" class="boss" :initialX="bossX"
+        @update:x="bossX = $event" @update:y="bossY = $event" @fire-power="startBossPower" @tocarPlayer="levarDano" />
 
 
       <!-- Sombra do Player -->
@@ -61,13 +61,13 @@
       </div>
 
       <!-- Player (envia posição/estado via eventos emitidos) -->
-      <Player :initialX="playerX" :initialY="jumpY" :pausado="jogoPausado || perguntaPausandoJogo"
+      <Player :key="playerKey" :initialX="playerX" :initialY="jumpY" :pausado="jogoPausado || perguntaPausandoJogo"
         @update:x="playerX = $event" @update:y="jumpY = $event" @update:direcao="direcao = $event"
         @update:estado="onPlayerEstado($event)" />
 
       <!-- Poder (vindo do Boss) -->
       <AnimatedPoder v-for="(poder, index) in poderes" :key="index" :x="poder.x" :y="poder.y" :frames="poder.frames"
-        :frame-delay="100" :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }" />
+        :frameDelay="100" :style="{ left: poder.x + 'px', bottom: (poder.y || 160) + 'px' }" />
 
       <!-- Tiro de Laser do Player -->
       <img v-if="tiroVisivel" src="/impacto_laser_pixelado.png" alt="Tiro de Laser" class="tiro"
@@ -145,7 +145,7 @@ const playerKey = ref(0);
 // Estados principais do GameTemplate
 // ──────────────────────────────────────────────────────────────
 
-
+const bossY = ref(300);
 
 let introTimeoutId = null;
 
@@ -232,6 +232,7 @@ let animacaoDourada = null;
 let timerPergunta = null;
 
 const poderes = ref([]);
+const bossKey = ref(0);
 
 watch(healthPercent, (newVal) => {
   setTimeout(() => {
@@ -326,20 +327,19 @@ function iniciarJogo() {
 // ──────────────────────────────────────────────────────────────
 
 function startBossPower({ frames, speed, x, y }) {
+  console.log("🛫 Recebido poder do boss:", frames, x, y);
   const poderX = (x ?? window.innerWidth - 200) - 80; // margem extra para segurança
-  const poderY = typeof y === "number" ? y : 300;
+  const poderY = typeof y === "number" ? y : bossY.value;
 
   console.log("🔥 Poder ajustado:", poderX, poderY);
 
   poderes.value.push({
-    frames,
+    frames: Array.isArray(frames) ? frames : [frames], // garante array
     x: poderX,
     y: poderY,
     speed
   });
 }
-
-
 
 // ──────────────────────────────────────────────────────────────
 // Tratamento de teclas para o jogo (pausar, respostas, tiro)
@@ -725,8 +725,9 @@ function emitirVitoria() {
 // Reiniciar Jogo
 // ──────────────────────────────────────────────────────────────
 function reiniciarJogo() {
-  limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
+  bossKey.value++;
   playerKey.value++;
+  limparJogo({ manterTeclado: true }); // Limpa corretamente, mantendo o teclado
   // Reset de vidas e estados visuais
   vidas.splice(0, vidas.length, true, true, true);
   poderes.value.splice(0, poderes.value.length);
