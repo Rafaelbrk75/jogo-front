@@ -62,7 +62,7 @@ function startFiring() {
 
     const basePayload = { frames, x: bossX.value, y: bossY.value };
 
-    if (contador % 10 === 0) {
+    if (contador % 8 === 0) {
       emit("fire-power", { ...basePayload, speed: 10 });
       emit("fire-power", { ...basePayload, speed: 7 });
       emit("fire-power", { ...basePayload, speed: 12 });

@@ -24,7 +24,7 @@ const emit = defineEmits(["vencerNivel"]);
 
 const cenario = "/fase4/cenario4.png";
 const musica = "/fase4/nivel4.mp3";
-const bossVidaInicial = 7;
+const bossVidaInicial = 10;
 
 // As perguntas e moedas são definidas diretamente no componente Game4
 const perguntas = {

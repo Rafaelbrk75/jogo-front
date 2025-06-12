@@ -28,7 +28,7 @@ const emit = defineEmits(["vencerNivel"]);
 
 const cenario = "/fase3/cenario3.png";
 const musica = "/fase3/nivel3.mp3";
-const bossVidaInicial = 3;
+const bossVidaInicial = 8;
 
 // Perguntas
 const perguntas = {

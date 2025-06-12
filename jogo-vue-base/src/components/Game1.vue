@@ -24,7 +24,7 @@ const emit = defineEmits(["vencerNivel"]);
 
 const cenario = "/fase1/cenario1.png";
 const musica = "/fase1/nivel1.mp3";
-const bossVidaInicial = 3;
+const bossVidaInicial = 5;
 
 const perguntas = {
   bronze: { resposta: "7", imagem: "/fase1/imgPerguntaBronze.png" },

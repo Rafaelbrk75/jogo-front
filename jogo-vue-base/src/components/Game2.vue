@@ -25,7 +25,7 @@ const emit = defineEmits(["vencerNivel"]);
 
 const cenario = "/fase2/nivel2.jpg";
 const musica = "/fase2/nivel2.mp3"; // ✅ Adicionada
-const bossVidaInicial = 4;
+const bossVidaInicial = 6;
 
 // ✅ Função levarDano fictícia (você pode alterar conforme sua lógica real)
 function levarDano() {
